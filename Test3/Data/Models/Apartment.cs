@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Test3.Models
+namespace Test3.Data.Models
 {
     public class Apartment
     {
@@ -33,5 +33,19 @@ namespace Test3.Models
 
         [BsonElement("AvailableRooms")]
         public int AvailableRooms { get; set; }
+
+        [BsonElement("LandlordId")]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string LandlordId { get; set; } = string.Empty;
+        
+        //Image
+        [BsonElement("ImageData")]
+        public byte[]? ImageData { get; set; }
+
+        [BsonElement("ImageContentType")]
+        public string ImageContentType { get; set; } = string.Empty;
+
+        [BsonElement("ImageFileName")]
+        public string ImageFileName { get; set; } = string.Empty;
     }
 }

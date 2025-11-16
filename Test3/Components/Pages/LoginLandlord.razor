@@ -1,6 +1,8 @@
 ﻿@page "/Landlord"
-@rendermode InteractiveServer
+@using Test3.Data.Services
+@inject LandlordService LandlordService
 @inject NavigationManager Navigation
+@rendermode InteractiveServer
 
 <link href="css/login.css" rel="stylesheet" />
 
@@ -19,28 +21,47 @@
 
     <button @onclick="LoginUser">Login</button>
 
-
     @if (!string.IsNullOrEmpty(errorMessage))
     {
         <p class="error">@errorMessage</p>
     }
 </div>
 
-
 @code {
     private string username = "";
     private string password = "";
     private string errorMessage = "";
 
-    private void LoginUser()
+    private async Task LoginUser()
     {
+        // First check for hardcoded admin credentials
         if (username == "admin" && password == "1234")
         {
-            Navigation.NavigateTo("/land_dashboard");
+            // For admin, you might want to handle differently
+            // For now, we'll navigate without an ID or use a default
+            Navigation.NavigateTo("/ManageApartment");
+            return;
         }
-        else
+
+        // Then check against database landlords
+        try
         {
-            errorMessage = "Invalid username or password.";
+            var landlord = await LandlordService.LoginAsync(username, password);
+
+            if (landlord != null)
+            {
+                // Successful login - pass landlord ID to ManageApartment
+                Navigation.NavigateTo($"/ManageApartment?landlordId={landlord.Id}");
+            }
+            else
+            {
+                errorMessage = "Invalid username or password.";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Login failed. Please try again.";
+            Console.WriteLine($"Landlord login error: {ex.Message}");
         }
     }
 }

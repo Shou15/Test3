@@ -27,6 +27,8 @@ builder.Services.AddScoped<IMongoDatabase>(sp =>
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<ApartmentService>();
 builder.Services.AddScoped<RoomService>();
+builder.Services.AddScoped<LandlordService>();
+builder.Services.AddScoped<ImageService>();
 
 var app = builder.Build();
 

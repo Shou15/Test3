@@ -1,7 +1,12 @@
-﻿@page "/ManageApt"
+﻿@page "/ManageApartment"
+@using Test3.Data.Models
+@using Test3.Data.Services
+@inject ApartmentService ApartmentService
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
+
 <link href="css/LandlordDashBoard.css" rel="stylesheet" />
+
 <div class="dashboard-layout">
     <!-- Sidebar -->
     <aside class="sidebar">
@@ -11,12 +16,10 @@
         </div>
 
         <nav>
-            <button class="nav-btn manage-unit" @onclick="ManageUnit">Manage Unit</button>
+            <button class="nav-btn manage-apartment" @onclick="ManageApartment">Manage Apartment</button>
             <button class="nav-btn list-tenants" @onclick="ListofTenants">List of Tenants</button>
             <button class="nav-btn transaction-history" @onclick="TransacHistory">Transaction History</button>
-            <button class="nav-btn manage-apartment" @onclick="ManageApartment">Manage Apartment</button>
         </nav>
-
 
         <div class="bottom-section">
             <button class="account-btn">
@@ -29,28 +32,215 @@
             </button>
         </div>
     </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <h3>My Apartments</h3>
+            <button class="add-btn" @onclick="AddApartment">+ Add Apartment</button>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="loading">Loading your apartments...</div>
+        }
+        else if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="error-message">@errorMessage</div>
+        }
+        else
+        {
+            <div class="units-grid">
+                @if (apartments.Any())
+                {
+                    @foreach (var apartment in apartments)
+                    {
+                        <div class="unit-card" @key="apartment.Id">
+                            <!-- Image Display -->
+                            <div class="unit-image">
+                                @if (apartment.ImageData != null && apartment.ImageData.Length > 0)
+                                {
+                                    <img src="data:@apartment.ImageContentType;base64,@Convert.ToBase64String(apartment.ImageData)"
+                                         alt="@apartment.ApartmentName"
+                                         class="apartment-image" />
+                                }
+                                else
+                                {
+                                    <div class="image-placeholder">
+                                        <span>No Image</span>
+                                    </div>
+                                }
+                            </div>
+                            <div class="unit-info">
+                                <h4>@(string.IsNullOrEmpty(apartment.ApartmentName) ? "New Apartment" : apartment.ApartmentName)</h4>
+                                <p>@(string.IsNullOrEmpty(apartment.Address) ? "Address not set" : apartment.Address)</p>
+                                <small>Rooms: @apartment.TotalRooms total, @apartment.AvailableRooms available</small>
+                            </div>
+                            <div class="card-actions">
+                                <button class="edit-btn" @onclick="() => EditApartment(apartment.Id)">Edit Apartment</button>
+                                <button class="delete-btn" @onclick="() => ShowDeleteConfirmation(apartment)">Delete</button>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="no-apartments">
+                        <p>You don't have any apartments yet.</p>
+                        <p>Click "Add Apartment" to get started!</p>
+                    </div>
+                }
+            </div>
+        }
+    </main>
 </div>
 
+<!-- Delete Confirmation Modal -->
+@if (showDeleteModal)
+{
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <h3>Confirm Delete</h3>
+            <p>Are you sure you want to delete apartment <strong>@apartmentToDelete?.ApartmentName</strong>?</p>
+            <p class="warning-text">This action cannot be undone and will permanently delete the apartment and all its data.</p>
+            <div class="modal-actions">
+                <button class="btn-cancel" @onclick="CancelDelete">Cancel</button>
+                <button class="btn-delete" @onclick="ConfirmDelete">Delete Permanently</button>
+            </div>
+        </div>
+    </div>
+}
 
 @code {
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "landlordId")]
+    public string? LandlordId { get; set; }
+
+    private List<Apartment> apartments = new();
+    private bool isLoading = true;
+    private bool showDeleteModal = false;
+    private Apartment? apartmentToDelete;
+    private string errorMessage = "";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrEmpty(LandlordId))
+        {
+            await LoadApartments();
+        }
+        else
+        {
+            errorMessage = "No landlord ID provided. Please login again.";
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadApartments()
+    {
+        isLoading = true;
+        errorMessage = "";
+
+        try
+        {
+            Console.WriteLine($"Loading apartments for landlord: {LandlordId}");
+            apartments = await ApartmentService.GetApartmentsByLandlordIdAsync(LandlordId!);
+            Console.WriteLine($"Found {apartments.Count} apartments");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error loading apartments. Please try again.";
+            Console.WriteLine($"Error loading apartments: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task AddApartment()
+    {
+        try
+        {
+            var newApartment = new Apartment
+            {
+                LandlordId = LandlordId!,
+                ApartmentName = "",
+                ApartmentOwner = "",
+                Address = "",
+                ContactNo = "",
+                FacebookAccount = "",
+                EmailAddress = "",
+                TotalRooms = 0,
+                AvailableRooms = 0
+            };
+
+            await ApartmentService.CreateApartmentAsync(newApartment);
+            await LoadApartments(); // Refresh the list
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error adding apartment. Please try again.";
+            Console.WriteLine($"Error adding apartment: {ex.Message}");
+        }
+    }
+
+    private void ShowDeleteConfirmation(Apartment apartment)
+    {
+        apartmentToDelete = apartment;
+        showDeleteModal = true;
+        StateHasChanged();
+    }
+
+    private void CancelDelete()
+    {
+        showDeleteModal = false;
+        apartmentToDelete = null;
+        StateHasChanged();
+    }
+
+    private async Task ConfirmDelete()
+    {
+        if (apartmentToDelete != null)
+        {
+            try
+            {
+                await ApartmentService.DeleteApartmentAsync(apartmentToDelete.Id);
+                showDeleteModal = false;
+                apartmentToDelete = null;
+                await LoadApartments(); // Refresh the list
+            }
+            catch (Exception ex)
+            {
+                errorMessage = "Error deleting apartment. Please try again.";
+                Console.WriteLine($"Error deleting apartment: {ex.Message}");
+            }
+        }
+    }
+
+    private void EditApartment(string id)
+    {
+        Navigation.NavigateTo($"/EditApartment/{id}?landlordId={LandlordId}");
+    }
+
     private void Logout()
     {
         Navigation.NavigateTo("/Landlord", true);
     }
-    private void ManageUnit()
-    {
-        Navigation.NavigateTo("/land_dashboard", true);
-    }
+
     private void ManageApartment()
     {
-        Navigation.NavigateTo("/ManageApt", true);
+        Navigation.NavigateTo($"/ManageApartment?landlordId={LandlordId}", true);
     }
+
     private void ListofTenants()
     {
-        Navigation.NavigateTo("/ListTenants", true);
+        Navigation.NavigateTo($"/ListTenants?landlordId={LandlordId}", true);
     }
+
     private void TransacHistory()
     {
-        Navigation.NavigateTo("/TransacHis", true);
+        Navigation.NavigateTo($"/TransacHis?landlordId={LandlordId}", true);
     }
+
 }

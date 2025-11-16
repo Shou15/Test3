@@ -1,0 +1,278 @@
+﻿@page "/EditApartment/{apartmentId}"
+@using Test3.Data.Models
+@using Test3.Data.Services
+@inject ApartmentService ApartmentService
+@inject ImageService ImageService
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+<link href="css/EditApartment.css" rel="stylesheet" />
+
+<div class="edit-container">
+    <div class="header">
+        <button class="back-btn" @onclick="GoBack">←</button>
+        <h2>EDIT APARTMENT</h2>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="loading">Loading apartment data...</div>
+    }
+    else if (apartment == null)
+    {
+        <div class="error">Apartment not found.</div>
+        <button class="back-btn" @onclick="GoBack">Go Back</button>
+    }
+    else
+    {
+        <div class="form-grid">
+            <div>
+                <label>Apartment Name:</label>
+                <input @bind="apartment.ApartmentName" class="text-input" placeholder="Enter apartment name" />
+            </div>
+            <div>
+                <label>Address:</label>
+                <input @bind="apartment.Address" class="text-input" placeholder="Enter full address" />
+            </div>
+            <div>
+                <label>Email Address:</label>
+                <input @bind="apartment.EmailAddress" class="text-input" placeholder="Enter email address" />
+            </div>
+            <div>
+                <label>Apartment Owner:</label>
+                <input @bind="apartment.ApartmentOwner" class="text-input" placeholder="Enter owner name" />
+            </div>
+            <div>
+                <label>Contact Number:</label>
+                <input @bind="apartment.ContactNo" class="text-input" placeholder="Enter contact number" />
+            </div>
+            <div>
+                <label>Facebook Account:</label>
+                <input @bind="apartment.FacebookAccount" class="text-input" placeholder="Enter Facebook account" />
+            </div>
+        </div>
+
+        <div class="image-upload">
+            <p><b>Apartment Image</b></p>
+
+            <!-- Current Image Preview -->
+            @if (!string.IsNullOrEmpty(currentImageSrc))
+            {
+                <div class="image-preview">
+                    <img src="@currentImageSrc" alt="Apartment image" class="preview-image" />
+                    <button type="button" class="remove-image-btn" @onclick="RemoveImage">Remove Image</button>
+                </div>
+            }
+
+            <!-- File Upload -->
+            <div class="file-upload-area">
+                <InputFile accept=".png,.jpg,.jpeg"
+                           OnChange="HandleFileSelected"
+                           class="file-input"
+                           id="fileInput" />
+                <label for="fileInput" class="file-input-label">
+                    <span>+ Choose Image (PNG, JPG, JPEG)</span>
+                </label>
+                @if (selectedFile != null)
+                {
+                    <div class="file-info">
+                        <span>Selected: @selectedFile.Name</span>
+                        <button type="button" @onclick="ClearSelectedFile">Clear</button>
+                    </div>
+                }
+            </div>
+
+            @if (!string.IsNullOrEmpty(uploadMessage))
+            {
+                <div class="upload-message @(isUploadError ? "error" : "info")">@uploadMessage</div>
+            }
+        </div>
+
+        <div class="units-header">
+            <div><b>Total Units:</b> @apartment.TotalRooms</div>
+            <div><b>Available:</b> @apartment.AvailableRooms</div>
+            <div><b>Occupied:</b> @(apartment.TotalRooms - apartment.AvailableRooms)</div>
+            <div><button style="color: #595858" class="add-unit-btn" @onclick="AddUnit">+ Add unit</button></div>
+        </div>
+
+        <div class="unit-list">
+            <!-- Room cards would go here -->
+            <div class="unit-card">
+                <div class="unit-img"></div>
+                <button class="edit-unit-btn">Edit Unit</button>
+            </div>
+        </div>
+
+        <div class="footer-actions">
+            <button class="save-btn" @onclick="SaveApartment" disabled="@isSaving">
+                @if (isSaving)
+                {
+                    <span>Saving...</span>
+                }
+                else
+                {
+                    <span>Save Apartment</span>
+                }
+            </button>
+            @if (!string.IsNullOrEmpty(saveMessage))
+            {
+                <div class="save-message @(isError ? "error" : "success")">@saveMessage</div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string ApartmentId { get; set; } = string.Empty;
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "landlordId")]
+    public string? LandlordId { get; set; }
+
+    private Apartment? apartment;
+    private bool isLoading = true;
+    private bool isSaving = false;
+    private string saveMessage = "";
+    private bool isError = false;
+    private string currentImageSrc = "";
+    private IBrowserFile? selectedFile;
+    private string uploadMessage = "";
+    private bool isUploadError = false;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrEmpty(ApartmentId))
+        {
+            await LoadApartment();
+        }
+        else
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadApartment()
+    {
+        isLoading = true;
+        try
+        {
+            apartment = await ApartmentService.GetApartmentByIdAsync(ApartmentId);
+            if (apartment?.ImageData != null)
+            {
+                currentImageSrc = ImageService.GetImageSrc(apartment.ImageData, apartment.ImageContentType);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading apartment: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        uploadMessage = "";
+        isUploadError = false;
+        StateHasChanged();
+    }
+
+    private void ClearSelectedFile()
+    {
+        selectedFile = null;
+        uploadMessage = "";
+        StateHasChanged();
+    }
+
+    private void RemoveImage()
+    {
+        if (apartment != null)
+        {
+            apartment.ImageData = null;
+            apartment.ImageContentType = "";
+            apartment.ImageFileName = "";
+            currentImageSrc = "";
+            StateHasChanged();
+        }
+    }
+
+    private async Task SaveApartment()
+    {
+        if (apartment == null) return;
+
+        isSaving = true;
+        saveMessage = "";
+        isError = false;
+        StateHasChanged();
+
+        try
+        {
+            // Process image upload if a file was selected
+            if (selectedFile != null)
+            {
+                try
+                {
+                    var (imageData, contentType, fileName) = await ImageService.ProcessUploadAsync(selectedFile);
+                    apartment.ImageData = imageData;
+                    apartment.ImageContentType = contentType;
+                    apartment.ImageFileName = fileName;
+                    uploadMessage = "Image processed successfully!";
+                    isUploadError = false;
+                }
+                catch (Exception ex)
+                {
+                    uploadMessage = ex.Message;
+                    isUploadError = true;
+                    isSaving = false;
+                    StateHasChanged();
+                    return;
+                }
+            }
+
+            await ApartmentService.UpdateApartmentAsync(apartment.Id, apartment);
+            saveMessage = "Apartment saved successfully!";
+            isError = false;
+
+            await Task.Delay(1000);
+            GoBack();
+        }
+        catch (Exception ex)
+        {
+            saveMessage = "Error saving apartment. Please try again.";
+            isError = true;
+            Console.WriteLine($"Error saving apartment: {ex.Message}");
+        }
+        finally
+        {
+            isSaving = false;
+            StateHasChanged();
+        }
+    }
+
+    private void AddUnit()
+    {
+        if (apartment != null)
+        {
+            apartment.TotalRooms++;
+            apartment.AvailableRooms++;
+            StateHasChanged();
+        }
+    }
+
+    private void GoBack()
+    {
+        if (!string.IsNullOrEmpty(LandlordId))
+        {
+            Navigation.NavigateTo($"/ManageApartment?landlordId={LandlordId}");
+        }
+        else
+        {
+            Navigation.NavigateTo("/ManageApartment");
+        }
+    }
+}

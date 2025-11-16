@@ -1,5 +1,5 @@
 ﻿using MongoDB.Driver;
-using Test3.Models;
+using Test3.Data.Models;
 
 namespace Test3.Data.Services
 {
@@ -50,6 +50,19 @@ namespace Test3.Data.Services
             var availableRooms = rooms.Count(r => r.Status == "Available");
 
             return (totalRooms, availableRooms);
+        }
+
+        public async Task<List<Room>> GetRoomsByLandlordIdAsync(string landlordId)
+        {
+            // First get all apartments for this landlord
+            var apartmentsCollection = _rooms.Database.GetCollection<Apartment>("Apartment");
+            var landlordApartments = await apartmentsCollection
+                .Find(x => x.LandlordId == landlordId)
+                .Project(x => x.Id)
+                .ToListAsync();
+
+            // Then get all rooms for these apartments
+            return await _rooms.Find(x => landlordApartments.Contains(x.ApartmentId)).ToListAsync();
         }
     }
 }

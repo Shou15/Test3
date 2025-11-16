@@ -9,12 +9,11 @@
             <img src="images/Default_Landlord.png" alt="Logo">
             <h2>DASHBOARD</h2>
         </div>
-        
+
         <nav>
-            <button class="nav-btn manage-unit" @onclick="ManageUnit">Manage Unit</button>
+            <button class="nav-btn manage-apartment" @onclick="ManageApartment">Manage Apartment</button>
             <button class="nav-btn list-tenants" @onclick="ListofTenants">List of Tenants</button>
             <button class="nav-btn transaction-history" @onclick="TransacHistory">Transaction History</button>
-            <button class="nav-btn manage-apartment" @onclick="ManageApartment">Manage Apartment</button>
         </nav>
 
 
@@ -36,13 +35,9 @@
     {
         Navigation.NavigateTo("/Landlord", true);
     }
-    private void ManageUnit()
-    {
-        Navigation.NavigateTo("/land_dashboard", true);
-    }
     private void ManageApartment()
     {
-        Navigation.NavigateTo("/ManageApt", true);
+        Navigation.NavigateTo("/ManageApartment", true);
     }
     private void ListofTenants()
     {

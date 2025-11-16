@@ -51,22 +51,19 @@
             <label>Gender:</label>
             <input @bind="user.Gender" />
 
-            <label>Username:</label>
-            <input @bind="user.Username" />
+            <label>Contact Number:</label>
+            <input @bind="user.ContactNumber" />
         </div>
 
         <div class="info-column">
             <label>Birthdate:</label>
             <input type="date" @bind="user.Birthdate" />
 
-            <label>Age:</label>
-            <input @bind="user.Age"/>
-
-            <label>Contact Number:</label>
-            <input @bind="user.ContactNumber" />
-
             <label>Email Address:</label>
             <input type="email" @bind="user.Email" />
+
+            <label>Username:</label>
+            <input @bind="user.Username" />
 
             <label>Password:</label>
             <input type="password" @bind="user.Password" />
@@ -91,7 +88,6 @@
             string.IsNullOrWhiteSpace(user.Email) ||
             string.IsNullOrWhiteSpace(user.Gender) ||
             string.IsNullOrWhiteSpace(user.Username) ||
-            string.IsNullOrWhiteSpace(user.Age) ||
             string.IsNullOrWhiteSpace(user.ContactNumber) ||
             string.IsNullOrWhiteSpace(user.Email) ||
             string.IsNullOrWhiteSpace(user.Password))

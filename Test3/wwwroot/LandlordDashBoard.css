@@ -1,36 +1,49 @@
-﻿/* Remove all default margins, make it fill the screen */
+﻿@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap');
+
+.screen-container {
+    width: 390px;
+    height: 1026px;
+    background-color: #64748B;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+}
+
 html, body {
     margin: 0;
     padding: 0;
     height: 100%;
     width: 100%;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f8f8;
-    overflow: hidden; /* Prevent scrolling */
+    font-family: 'Archivo Black', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 20px;
+    background-color: #64748B;
+    overflow: hidden;
 }
 
-/* Main layout */
 .dashboard-layout {
     display: grid;
-    grid-template-columns: 260px 1fr; /* Sidebar (left) + Main content (right) */
+    grid-template-columns: 260px 1fr;
     height: 100vh;
     width: 100vw;
+    background-color: #64748B;
 }
 
-/* Sidebar */
 .sidebar {
-    background-color: #d9d9d9;
+    background-color: #64748B;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1.5rem 0;
+    padding: 2.5rem 0;
     height: 100%;
     box-sizing: border-box;
+    font-family: 'Archivo Black', sans-serif;
 }
 
 .logo {
     text-align: center;
     margin-bottom: 2rem;
+    font-family: 'Archivo Black', sans-serif;
+    color: white;
 }
 
     .logo img {
@@ -45,34 +58,48 @@ html, body {
         font-weight: normal;
         margin-top: 0.5rem;
         letter-spacing: 0.5px;
+        font-family: 'Archivo Black', sans-serif;
+        color: white;
     }
 
 nav {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 15px;
     width: 100%;
     align-items: center;
+    font-family: 'Archivo Black', sans-serif;
 }
 
 .nav-btn {
-    background: #f2f2f2;
+    width: 200px;
+    height: 50px;
     border: none;
-    padding: 0.7rem 1rem;
-    width: 80%;
-    border-radius: 15px;
+    border-radius: 10px;
     cursor: pointer;
     text-align: center;
-    transition: background 0.2s;
+    transition: all 0.2s;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-btn {
+    background-color: transparent;
+    color: white;
+    border: 2px solid white;
 }
 
     .nav-btn:hover {
-        background: #e2e2e2;
+        background-color: white;
+        color: #64748B;
     }
 
     .nav-btn.active {
-        background: #cfcfcf;
-        font-weight: bold;
+        background-color: white;
+        color: #64748B;
     }
 
 .bottom-section {
@@ -80,8 +107,9 @@ nav {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: 15px;
     padding-bottom: 1.5rem;
+    font-family: 'Archivo Black', sans-serif;
 }
 
 .account-btn, .logout-btn {
@@ -89,96 +117,191 @@ nav {
     border: none;
     cursor: pointer;
     font-size: 1rem;
+    font-family: 'Archivo Black', sans-serif;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    transition: all 0.2s;
 }
 
-.icon {
-    margin-right: 0.4rem;
-}
+    .account-btn:hover, .logout-btn:hover {
+        color: white;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+    }
 
-/* Main content area */
 .main-content {
-    padding: 2rem 3rem;
-    background-color: #fff;
+    padding: 0.5rem 3rem 1rem 3rem;
+    background-color: white;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     height: 100%;
     box-sizing: border-box;
+    font-family: 'Archivo Black', sans-serif;
+    overflow-y: auto;
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 0.5rem;
+    font-family: 'Archivo Black', sans-serif;
+    background: #64748B;
+    padding: 1rem 1.5rem;
+    border-radius: 20px;
+    color: white;
 }
 
 .stats {
     display: flex;
-    gap: 2rem;
-    font-size: 1rem;
+    gap: 8rem;
+    font-size: 20px;
 }
 
+    .stats span {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 0.5rem 1rem;
+        border-radius: 15px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .stats strong {
+        font-weight: bold;
+        color: #ffffff;
+        margin-left: 0.3rem;
+    }
+
 .add-btn {
-    background: #d9d9d9;
+    background: white;
+    color: #64748B;
     border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 10px;
+    width: 221px;
+    height: 54px;
+    padding: 0;
+    border-radius: 15px;
     cursor: pointer;
     font-weight: bold;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 16px;
     transition: background 0.2s;
 }
 
-    .add-btn:hover {
-        background: #cfcfcf;
-    }
+.edit-btn {
+    background: #64748B;
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 12px;
+}
 
-/* Grid for apartment units */
-.units-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 1.5rem;
-    flex: 1;
-    overflow-y: auto; /* scroll only this area if needed */
-    padding-right: 0.5rem;
+.add-btn:hover {
+    background: #e0e0e0;
 }
 
 .unit-card {
-    background: #f0f0f0;
-    border-radius: 12px;
+    background: #f8f9fa;
+    border-radius: 10px;
     padding: 1rem 1.2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    height: 100px;
+    border: 1px solid #e9ecef;
+    height: 80px;
     transition: background 0.2s;
+    font-family: 'Archivo Black', sans-serif;
 }
 
-    .unit-card:hover {
-        background: #e8e8e8;
+.units-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 330px);
+    gap: 200px;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.unit-card {
+    background: #f0f0f0;
+    border-radius: 10px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #e9ecef;
+    width: 350px;
+    height: 240px;
+    box-sizing: border-box;
+    transition: background 0.2s;
+    font-family: 'Archivo Black', sans-serif;
+}
+
+    .unit-card:nth-child(1),
+    .unit-card:nth-child(2),
+    .unit-card:nth-child(3) {
+        margin-top: 50px;
     }
 
-.unit-info h4 {
-    margin: 0;
-    font-size: 1rem;
+    .unit-card:nth-child(4),
+    .unit-card:nth-child(5),
+    .unit-card:nth-child(6) {
+        margin-top: -50px;
+    }
+
+    .unit-card:hover {
+        background: #e9ecef;
+    }
+
+.unit-info {
+    text-align: center;
+    width: 100%;
 }
 
-.unit-info p {
-    margin: 0.4rem 0 0 0;
-    font-size: 0.9rem;
-    color: #333;
-}
+    .unit-info h4 {
+        margin: 0;
+        font-size: 1rem;
+        font-family: 'Archivo Black', sans-serif;
+    }
+
+    .unit-info p {
+        margin: 0.4rem 0 0 0;
+        font-size: 0.9rem;
+        color: #333;
+        font-family: 'Archivo Black', sans-serif;
+    }
 
 .edit-btn {
-    background: #d9d9d9;
+    background: white;
+    color: #64748B;
     border: none;
-    padding: 0.4rem 1rem;
+    width: 220px;
+    height: 54px;
+    padding: 0;
     border-radius: 10px;
     cursor: pointer;
     transition: background 0.2s;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
 }
 
     .edit-btn:hover {
-        background: #cfcfcf;
+        background: #e0e0e0;
     }
+
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Archivo Black', sans-serif;
+    color: #333;
+}
+
+p, span, div {
+    font-family: 'Archivo Black', sans-serif;
+}
