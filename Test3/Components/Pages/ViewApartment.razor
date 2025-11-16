@@ -1,68 +1,126 @@
-﻿@page "/ViewApartment"
+﻿@page "/ViewApartment/{apartmentId}"
+@using Test3.Models
+@using Test3.Data.Services
+@inject ApartmentService ApartmentService
+@inject RoomService RoomService
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
 
 <div class="container">
-    <header class="header">
-        <div class="logo">
-            <img src="images/Default_Landlord.png" alt="Logo">
-            <h2>LANDLORD PRO</h2>
-        </div>
-
-        <div class="contact-info">
-            <p><strong>NAME:</strong> JUAN DELA CRUZ</p>
-            <p><strong>ADDRESS:</strong> BRGY. 68, RIZAL, LEGAZPI CITY</p>
-            <p><strong>FACEBOOK:</strong> MANG JUAN</p>
-            <p><strong>EMAIL:</strong> mangjuan123@gmail.com</p>
-        </div>
-
-        <div class="summary">
-            <p><strong>Total room:</strong> 6</p>
-            <p><strong>Available Room:</strong> 2</p>
-        </div>
-    </header>
-
-    <h3 class="contact-title">CONTACT THE LANDLORD AT:</h3>
-
-    <section class="room-grid">
-        @foreach (var room in rooms)
-        {
-            <div class="room-card">
-                <div class="room-img"></div>
-                <div class="room-details">
-                    <p><strong>Unit Number:</strong> @room.UnitNumber</p>
-                    <p><strong>Room type:</strong> @room.RoomType</p>
-                    <p><strong>Room Price:</strong> @room.RoomPrice</p>
-                    <p><strong>Aircon:</strong> @room.Aircon</p>
-                    <p>
-                        <strong>Status:</strong>
-                        <span class="@(room.Status == "Available" ? "status-available" : "status-occupied")">
-                            @room.Status
-                        </span>
-                    </p>
-                </div>
+    @if (isLoading)
+    {
+        <div class="loading">Loading apartment details...</div>
+    }
+    else if (apartment == null)
+    {
+        <div class="error">Apartment not found.</div>
+        <button @onclick="GoBack" class="back-btn">Go Back to Dashboard</button>
+    }
+    else
+    {
+        <header class="header">
+            <div class="logo">
+                <img src="images/Default_Landlord.png" alt="Logo">
+                <h2>LANDLORD PRO</h2>
             </div>
-        }
-    </section>
+
+            <div class="contact-info">
+                <p><strong>NAME:</strong> @apartment.ApartmentOwner</p>
+                <p><strong>ADDRESS:</strong> @apartment.Address</p>
+                <p><strong>FACEBOOK:</strong> @apartment.FacebookAccount</p>
+                <p><strong>EMAIL:</strong> @apartment.EmailAddress</p>
+                <p><strong>CONTACT NO:</strong> @apartment.ContactNo</p>
+            </div>
+
+            <div class="summary">
+                <p><strong>Total rooms:</strong> @roomStats.totalRooms</p>
+                <p><strong>Available Room:</strong> @roomStats.availableRooms</p>
+            </div>
+        </header>
+
+        <h3 class="contact-title">CONTACT THE LANDLORD AT: @apartment.ContactNo</h3>
+
+        <section class="room-grid">
+            @if (rooms.Any())
+            {
+                @foreach (var room in rooms)
+                {
+                    <div class="room-card">
+                        <div class="room-img"></div>
+                        <div class="room-details">
+                            <p><strong>Unit Number:</strong> @room.UnitNumber</p>
+                            <p><strong>Room type:</strong> @room.RoomType</p>
+                            <p><strong>Room Price:</strong> ₱@room.RoomPrice.ToString("N2")</p>
+                            <p><strong>Aircon:</strong> @(room.Aircon ? "Yes" : "No")</p>
+                            <p>
+                                <strong>Status:</strong>
+                                <span class="@(room.Status == "Available" ? "status-available" : "status-occupied")">
+                                    @room.Status
+                                </span>
+                            </p>
+                            @if (!string.IsNullOrEmpty(room.Description))
+                            {
+                                <p><strong>Description:</strong> @room.Description</p>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="no-rooms">No rooms available for this apartment.</div>
+            }
+        </section>
+
+        <div class="action-buttons">
+            <button @onclick="GoBack" class="back-btn">Back to Dashboard</button>
+        </div>
+    }
 </div>
 
 @code {
-    public class Room
+    [Parameter]
+    public string ApartmentId { get; set; } = string.Empty;
+
+    private Apartment? apartment;
+    private List<Room> rooms = new();
+    private (int totalRooms, int availableRooms) roomStats;
+    private bool isLoading = true;
+
+    protected override async Task OnParametersSetAsync()
     {
-        public string UnitNumber { get; set; }
-        public string RoomType { get; set; }
-        public string RoomPrice { get; set; }
-        public string Aircon { get; set; }
-        public string Status { get; set; }
+        if (!string.IsNullOrEmpty(ApartmentId))
+        {
+            await LoadApartmentData();
+        }
+        else
+        {
+            isLoading = false;
+        }
     }
 
-    private List<Room> rooms = new()
+    private async Task LoadApartmentData()
     {
-        new Room { UnitNumber="101", RoomType="Double Room", RoomPrice="12,000 php", Aircon="Yes", Status="Available"},
-        new Room { UnitNumber="102", RoomType="Single Room", RoomPrice="8,000 php", Aircon="No", Status="Occupied"},
-        new Room { UnitNumber="103", RoomType="Single Room", RoomPrice="10,000 php", Aircon="Yes", Status="Occupied"},
-        new Room { UnitNumber="104", RoomType="Double Room", RoomPrice="12,000 php", Aircon="Yes", Status="Occupied"},
-        new Room { UnitNumber="105", RoomType="Single Room", RoomPrice="8,000 php", Aircon="No", Status="Available"},
-        new Room { UnitNumber="106", RoomType="Double Room", RoomPrice="12,000 php", Aircon="Yes", Status="Occupied"},
-    };
+        isLoading = true;
+
+        // Load apartment details
+        apartment = await ApartmentService.GetApartmentByIdAsync(ApartmentId);
+
+        if (apartment != null)
+        {
+            // Load rooms for this apartment
+            rooms = await RoomService.GetRoomsByApartmentIdAsync(ApartmentId);
+
+            // Calculate room statistics
+            roomStats = await RoomService.GetRoomStatsAsync(ApartmentId);
+        }
+
+        isLoading = false;
+        StateHasChanged();
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/dashboard");
+    }
 }

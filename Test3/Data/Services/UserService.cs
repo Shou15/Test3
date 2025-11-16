@@ -1,6 +1,7 @@
 ﻿using MongoDB.Driver;
+using Test3.Data.Models;
 
-namespace Test3.Data
+namespace Test3.Data.Services
 {
     public class UserService
     {

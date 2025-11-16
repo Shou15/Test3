@@ -1,7 +1,12 @@
 ﻿@page "/dashboard"
+@using Test3.Models
+@using Test3.Data.Services
+@inject ApartmentService ApartmentService
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
+
 <link href="css/dashboard.css" rel="stylesheet" />
+
 <div class="dashboard-container">
     <!-- Header -->
     <header class="dashboard-header">
@@ -14,7 +19,10 @@
         </div>
         <div class="center-section">
             <div class="search-bar">
-                <input type="text" placeholder="Search" />
+                <input type="text"
+                       placeholder="Search by apartment name or location"
+                       @bind="searchTerm"
+                       @bind:event="oninput" />
                 <button><i class="fa fa-search"></i></button>
             </div>
         </div>
@@ -25,24 +33,87 @@
             </div>
         </div>
     </header>
+
     <!-- Apartments Grid -->
     <main class="apartments-grid">
-        @for (int i = 0; i < 6; i++)
+        @if (isLoading)
         {
-            <div class="apartment-card">
-                <div class="image-placeholder"></div>
-                <div class="info">
-                    <p><strong>Location:</strong></p>
-                    <p><strong>Name of Apartment:</strong></p>
+            <div class="loading">Loading apartments...</div>
+        }
+        else if (apartments.Any())
+        {
+            @foreach (var apartment in apartments)
+            {
+                <div class="apartment-card">
+                    <div class="image-placeholder"></div>
+                    <div class="info">
+                        <p><strong>Location:</strong> @apartment.Address</p>
+                        <p><strong>Name of Apartment:</strong> @apartment.ApartmentName</p>
+                    </div>
+                    <button class="view-btn" @onclick="() => ViewApartment(apartment.Id)">View</button>
                 </div>
-                <button class="view-btn" @onclick="() => ViewApartment()">View</button>
+            }
+        }
+        else
+        {
+            <div class="no-apartments">
+                No apartments found. @(string.IsNullOrEmpty(searchTerm) ? "The database might be empty." : "Try a different search term.")
             </div>
         }
     </main>
 </div>
+
 @code {
-    private void ViewApartment()
+    private List<Apartment> apartments = new();
+    private string searchTerm = string.Empty;
+    private bool isLoading = true;
+    private Timer? searchTimer;
+
+    protected override async Task OnInitializedAsync()
     {
-        Navigation.NavigateTo("/ViewApartment");
+        await LoadApartments();
+    }
+
+    private async Task LoadApartments()
+    {
+        isLoading = true;
+        StateHasChanged(); // Force UI update to show loading
+
+        if (string.IsNullOrEmpty(searchTerm))
+        {
+            apartments = await ApartmentService.GetApartmentsAsync();
+        }
+        else
+        {
+            apartments = await ApartmentService.SearchApartmentsAsync(searchTerm);
+        }
+
+        isLoading = false;
+        StateHasChanged(); // Force UI update to show results
+    }
+
+    private async void OnSearchChanged(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? string.Empty;
+
+        // Simple debounce - wait 300ms after user stops typing
+        searchTimer?.Dispose();
+        searchTimer = new Timer(async _ =>
+        {
+            await InvokeAsync(LoadApartments);
+        }, null, 300, Timeout.Infinite);
+    }
+
+    void ViewApartment(string id)
+    {
+        Navigation.NavigateTo($"/ViewApartment/{id}");
+    }
+
+
+
+
+    public void Dispose()
+    {
+        searchTimer?.Dispose();
     }
 }

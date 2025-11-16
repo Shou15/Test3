@@ -1,6 +1,6 @@
 using MongoDB.Driver;
 using Test3.Components;
-using Test3.Data;
+using Test3.Data.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +25,8 @@ builder.Services.AddScoped<IMongoDatabase>(sp =>
 
 // Register UserService
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ApartmentService>();
+builder.Services.AddScoped<RoomService>();
 
 var app = builder.Build();
 
