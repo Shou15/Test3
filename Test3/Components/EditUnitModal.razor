@@ -85,13 +85,14 @@
                                     <div class="images-grid">
                                         @for (int i = 0; i < CurrentRoom.Images.Count; i++)
                                         {
+                                            var index = i; // Capture the index in a local variable
                                             var image = CurrentRoom.Images[i];
                                             <div class="image-item">
                                                 <img src="data:@image.ImageContentType;base64,@Convert.ToBase64String(image.ImageData)"
                                                      alt="Unit image"
                                                      class="preview-image-multiple" />
                                                 <button type="button" class="remove-existing-image-btn"
-                                                        @onclick="() => RemoveExistingImage(i)">
+                                                        @onclick="() => RemoveExistingImage(index)">
                                                     ×
                                                 </button>
                                             </div>
@@ -191,19 +192,22 @@
     private List<IBrowserFile> selectedFiles = new();
     private Dictionary<IBrowserFile, string> imagePreviews = new();
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         if (IsVisible)
         {
-            LoadRoomData();
+            await LoadRoomData();
         }
     }
 
-    private void LoadRoomData()
+    private async Task LoadRoomData()
     {
+        // Add a small delay to ensure parameter is set
+        await Task.Delay(1);
+
         if (Room != null)
         {
-            // Editing existing room
+            // Editing existing room - create a COMPLETE deep copy to avoid reference issues
             CurrentRoom = new Room
             {
                 Id = Room.Id,
@@ -215,7 +219,15 @@
                 Aircon = Room.Aircon,
                 Status = Room.Status,
                 Description = Room.Description,
-                Images = Room.Images?.ToList() ?? new List<RoomImage>()
+                CreatedAt = Room.CreatedAt,
+                // Create completely new image objects to break any references
+                Images = Room.Images?.Select(img => new RoomImage
+                {
+                    ImageData = (byte[])img.ImageData.Clone(),
+                    ImageContentType = img.ImageContentType,
+                    ImageFileName = img.ImageFileName,
+                    UploadedAt = img.UploadedAt
+                }).ToList() ?? new List<RoomImage>()
             };
         }
         else
@@ -238,6 +250,8 @@
         imagePreviews.Clear();
         saveMessage = "";
         isError = false;
+
+        StateHasChanged();
     }
 
     private async Task CloseModal()
@@ -277,12 +291,20 @@
         StateHasChanged();
     }
 
-    private void RemoveExistingImage(int index)
+    private async Task RemoveExistingImage(int index)
     {
         if (index >= 0 && index < CurrentRoom.Images.Count)
         {
             CurrentRoom.Images.RemoveAt(index);
+
+            // Optional: Show a temporary message
+            saveMessage = $"Image removed. Click 'Save Unit' to confirm changes.";
+            isError = false;
+
             StateHasChanged();
+
+            // Clear the message after 3 seconds
+            await ClearMessageAfterDelay();
         }
     }
 
@@ -327,8 +349,9 @@
                 }
             }
 
-            // Combine existing and new images
-            var allImages = isNewRoom ? newImages : CurrentRoom.Images.Concat(newImages).ToList();
+            // Combine existing images (which may have been modified by removals) and new images
+            // CurrentRoom.Images already reflects any removals from the RemoveExistingImage method
+            var allImages = CurrentRoom.Images.Concat(newImages).ToList();
             CurrentRoom.Images = allImages;
 
             Room savedRoom;
@@ -354,7 +377,9 @@
             }
             else
             {
-                // Update existing room
+                // Update existing room - this will save the modified Images list
+                // The Images list already has the removed images excluded
+                CurrentRoom.ApartmentId = ApartmentId; // Ensure ApartmentId is set
                 await RoomService.UpdateRoomAsync(CurrentRoom.Id, CurrentRoom);
                 savedRoom = CurrentRoom;
                 saveMessage = "Unit updated successfully!";
@@ -380,5 +405,12 @@
             isSaving = false;
             StateHasChanged();
         }
+    }
+
+    private async Task ClearMessageAfterDelay()
+    {
+        await Task.Delay(3000);
+        saveMessage = "";
+        StateHasChanged();
     }
 }
