@@ -189,77 +189,66 @@ nav {
 }
 
 .edit-btn {
-    background: #64748B;
-    color: white;
+    background: white;
+    color: #64748B;
     border: none;
-    padding: 0.4rem 1rem;
-    border-radius: 8px;
+    width: auto;
+    height: auto;
+    padding: 0.6rem 1.4rem;
+    border-radius: 12px;
     cursor: pointer;
     transition: background 0.2s;
     font-family: 'Archivo Black', sans-serif;
-    font-size: 12px;
+    font-size: 14px;
+    font-weight: bold;
+    margin-left: 0;
 }
+
+    .edit-btn:hover {
+        background: #e0e0e0;
+    }
 
 .add-btn:hover {
     background: #e0e0e0;
 }
 
-.unit-card {
-    background: #f8f9fa;
-    border-radius: 10px;
-    padding: 1rem 1.2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid #e9ecef;
-    height: 80px;
-    transition: background 0.2s;
-    font-family: 'Archivo Black', sans-serif;
-}
-
 .units-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 330px);
-    gap: 200px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 3rem;
+    padding: 2rem;
     margin-top: 0.5rem;
     margin-bottom: 1rem;
 }
 
 .unit-card {
-    background: #f0f0f0;
-    border-radius: 10px;
-    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    padding: 2rem;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    height: 340px;
+    min-height: 340px;
+    overflow: hidden;
+    position: relative;
     border: 1px solid #e9ecef;
-    width: 350px;
-    height: 240px;
-    box-sizing: border-box;
     transition: background 0.2s;
     font-family: 'Archivo Black', sans-serif;
+    width: auto;
 }
-
-    .unit-card:nth-child(1),
-    .unit-card:nth-child(2),
-    .unit-card:nth-child(3) {
-        margin-top: 50px;
-    }
-
-    .unit-card:nth-child(4),
-    .unit-card:nth-child(5),
-    .unit-card:nth-child(6) {
-        margin-top: -50px;
-    }
 
     .unit-card:hover {
         background: #e9ecef;
     }
 
 .unit-info {
-    text-align: center;
+    text-align: left;
     width: 100%;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 0;
 }
 
     .unit-info h4 {
@@ -269,36 +258,13 @@ nav {
     }
 
     .unit-info p {
-        margin: 0.4rem 0 0 0;
+        margin: 0.3rem 0 0 0;
         font-size: 0.9rem;
         color: #333;
         font-family: 'Archivo Black', sans-serif;
+        line-height: 1.4;
     }
 
-.edit-btn {
-    background: white;
-    color: #64748B;
-    border: none;
-    width: 220px;
-    height: 54px;
-    padding: 0;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: background 0.2s;
-    font-family: 'Archivo Black', sans-serif;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-    .edit-btn:hover {
-        background: #e0e0e0;
-    }
-
-
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Archivo Black', sans-serif;
-    color: #333;
-}
 
 p, span, div {
     font-family: 'Archivo Black', sans-serif;
@@ -312,11 +278,11 @@ p, span, div {
 }
 
 .apartment-image, .image-placeholder {
-    width: 200px;
-    height: 200px;
+    width: 150px;
+    height: 180px;
     object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .image-placeholder {
@@ -338,7 +304,11 @@ p, span, div {
     display: flex;
     gap: 10px;
     width: 100%;
-    justify-content: center;
+    justify-content: flex-end;
+    margin-top: auto;
+    position: absolute;
+    bottom: 2rem;
+    right: 2rem;
 }
 
 .delete-btn {
@@ -381,6 +351,7 @@ p, span, div {
     font-size: 1.1rem;
     grid-column: 1 / -1;
 }
+
 .modal-overlay {
     position: fixed;
     top: 0;
