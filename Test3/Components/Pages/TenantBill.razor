@@ -1,11 +1,13 @@
-﻿@page "/payments"
+@page "/payments"
 @rendermode InteractiveServer
+@inject NavigationManager Navigation
 
 <PageTitle>Landlord Payment Tracker</PageTitle>
 
 <div class="container">
+    <button class="back_btn" @onclick="BackBtn">Back to Dashboard</button>
     <div class="header-section">
-
+        <h2>BILL FOR NEXT MONTH</h2>
         <div class="info-grid">
             <div class="info-row">
                 <label>Room:</label>
@@ -105,7 +107,10 @@
             PaymentMethod = "";
         }
     }
-
+    void BackBtn()
+    {
+        Navigation.NavigateTo($"/dashboard");
+    }
     public class Payment
     {
         public DateTime Date { get; set; }
