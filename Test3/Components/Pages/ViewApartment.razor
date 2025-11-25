@@ -1,4 +1,4 @@
-﻿@page "/ViewApartment/{apartmentId}"
+﻿@page "/ViewApartment/{apartmentId}/{userId}"
 @using Test3.Data.Models
 @using Test3.Data.Services
 @inject ApartmentService ApartmentService
@@ -82,6 +82,9 @@
     [Parameter]
     public string ApartmentId { get; set; } = string.Empty;
 
+    [Parameter]
+    public string UserId { get; set; } = string.Empty;
+
     private Apartment? apartment;
     private List<Room> rooms = new();
     private (int totalRooms, int availableRooms) roomStats;
@@ -121,6 +124,7 @@
 
     private void GoBack()
     {
-        Navigation.NavigateTo("/dashboard");
+        // Navigate back to dashboard with user ID
+        Navigation.NavigateTo($"/dashboard/{UserId}");
     }
 }

@@ -23,6 +23,10 @@ namespace Test3.Data.Services
             return await _users.Find(u => u.Username == username && u.Password == password)
                                 .FirstOrDefaultAsync();
         }
+        public async Task<User?> GetUserByIdAsync(string id)
+        {
+            return await _users.Find(u => u.Id == id).FirstOrDefaultAsync();
+        }
 
         // Additional methods for tenant-like functionality
         public async Task<User?> GetUserByEmailAsync(string email)

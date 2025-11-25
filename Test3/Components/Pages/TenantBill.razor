@@ -1,4 +1,4 @@
-@page "/payments"
+@page "/payments/{UserId}"
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
 
@@ -80,6 +80,9 @@
 </div>
 
 @code {
+    [Parameter]
+    public string UserId { get; set; } = string.Empty;
+
     private string Room { get; set; } = "";
     private string Water { get; set; } = "";
     private string Electricity { get; set; } = "";
@@ -109,7 +112,7 @@
     }
     void BackBtn()
     {
-        Navigation.NavigateTo($"/dashboard");
+        Navigation.NavigateTo($"/dashboard/{UserId}");
     }
     public class Payment
     {

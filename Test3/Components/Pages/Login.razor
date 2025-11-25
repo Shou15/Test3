@@ -60,7 +60,7 @@
 
         if (username == "admin" && password == "1234")
         {
-            Navigation.NavigateTo("/dashboard");
+            Navigation.NavigateTo("/dashboard/admin");
             return;
         }
 
@@ -70,7 +70,8 @@
 
             if (user != null)
             {
-                Navigation.NavigateTo("/dashboard");
+                // Change this line to use route parameter instead of query string
+                Navigation.NavigateTo($"/dashboard/{user.Id}");
             }
             else
             {

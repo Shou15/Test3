@@ -255,3 +255,141 @@ body {
     font-size: 1.1rem;
     color: #666;
 }
+
+/* Modal styles - KEEP for logout confirmation */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.confirmation-modal {
+    max-width: 400px;
+    text-align: center;
+}
+
+.confirmation-header h3 {
+    margin: 0 0 15px 0;
+    color: #333;
+}
+
+.confirmation-body {
+    margin-bottom: 20px;
+}
+
+.confirmation-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.cancel-btn, .confirm-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.cancel-btn {
+    background: #6c757d;
+    color: white;
+}
+
+.confirm-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background: #5a6268;
+}
+
+.confirm-btn:hover {
+    background: #c82333;
+}
+/* Account Dropdown Styles - Matching View Bill button */
+.account-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.account-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    outline: none;
+    border-radius: 8px;
+    background-color: #bfbfbf;
+    padding: 8px 20px;
+    font-size: 15px;
+    color: #000;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: Arial, sans-serif;
+}
+
+    .account-btn:hover {
+        background-color: #b0b0b0;
+    }
+
+    .account-btn i {
+        font-size: 1.2rem;
+    }
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    min-width: 150px;
+    z-index: 1000;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 15px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+    color: #333;
+    font-family: Arial, sans-serif;
+}
+
+    .dropdown-item:hover {
+        background-color: #f5f5f5;
+    }
+
+    .dropdown-item i {
+        width: 16px;
+        text-align: center;
+        font-size: 14px;
+    }

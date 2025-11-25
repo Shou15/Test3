@@ -55,7 +55,9 @@
 
         <div class="info-column">
             <label>Birthdate:</label>
-            <input type="date" @bind="user.Birthdate" />
+            <input type="date" @bind="user.Birthdate"
+                   min="@minBirthdate.ToString("yyyy-MM-dd")"
+                   max="@maxBirthdate.ToString("yyyy-MM-dd")" />
 
             <label>Email Address:</label>
             <input type="email" @bind="user.Email" />
@@ -76,6 +78,18 @@
 @code {
     private User user = new();
     private string message = "";
+    private DateTime minBirthdate;
+    private DateTime maxBirthdate;
+
+    protected override void OnInitialized()
+    {
+        // Calculate date range: from 100 years ago to today
+        maxBirthdate = DateTime.Today;
+        minBirthdate = maxBirthdate.AddYears(-100);
+
+        // Set default birthdate to 30 years ago (common adult age)
+        user.Birthdate = maxBirthdate.AddYears(-30);
+    }
 
     private async Task SignUpUser()
     {
@@ -91,6 +105,12 @@
             string.IsNullOrWhiteSpace(user.Password))
         {
             message = "Please fill all required fields.";
+            return;
+        }
+
+        if (user.Birthdate < minBirthdate || user.Birthdate > maxBirthdate)
+        {
+            message = $"Please select a valid birthdate between {minBirthdate:MM/dd/yyyy} and {maxBirthdate:MM/dd/yyyy}.";
             return;
         }
 
