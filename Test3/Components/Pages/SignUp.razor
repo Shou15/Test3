@@ -1,4 +1,4 @@
-﻿@page "/SignUp"
+@page "/SignUp"
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
 @inject UserService UserService
@@ -8,78 +8,106 @@
 @inject IJSRuntime JSRuntime
 
 <div class="profile-container">
-    <header class="profile-header">
-        <div class="logo">
-            <img src="images/Default_Landlord.png" alt="Default User" />
-        </div>
-        <h2>User Sign Up</h2>
-    </header>
+	<header class="profile-header">
+        <button class="back-btn" @onclick="NavigateToLogin">← Back</button>
 
-    <div class="photo-section">
-        <div class="photo-placeholder">
-            @if (imageUrl != null)
-            {
-                <img src="@imageUrl" alt="User Photo"
-                     style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;" />
-            }
-            else
-            {
-                <img src="images/Default_Landlord.png" alt="Default User"
-                     style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;" />
-            }
-        </div>
-        <br>
-        <InputFile OnChange="HandleFileSelected"
-                   accept=".png,.jpg,.jpeg"
-                   class="insert-photo-file-input"
-                   style="width:200px"/>
-    </div>
 
-    <div class="info-section">
-        <div class="info-column">
-            <label>First Name:</label>
-            <input @bind="user.FirstName" />
 
-            <label>Middle Name:</label>
-            <input @bind="user.MiddleName" />
+		<div class="photo-section">
+			<h2 class="section-title">Tenant's Personal Information</h2>
+			<div class="photo-placeholder">
+				@if (imageUrl != null)
+				{
+					<img src="@imageUrl" alt="User Photo"
+						 style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;" />
+				}
+				else
+				{
+					<img src="images/Default_Landlord.png" alt="Default User"
+						 style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;" />
+				}
+			</div>
 
-            <label>Last Name:</label>
-            <input @bind="user.LastName" />
+			<div class="file-input-wrapper">
+				<label class="custom-file-input">
+					<InputFile OnChange="HandleFileSelected"
+							   accept=".png,.jpg,.jpeg"
+							   class="hidden-file-input" />
+				</label>
+
+
+			</div>
+		</div>
+
+	</header>
+
+	<div class="info-section">
+		<div class="info-column">
+			<label>First Name:</label>
+			<input @bind="user.FirstName" />
+
+			<label>Middle Name:</label>
+			<input @bind="user.MiddleName" />
+
+			<label>Last Name:</label>
+			<input @bind="user.LastName" />
 
             <label>Gender:</label>
-            <input @bind="user.Gender" />
+            <div class="select-wrapper">
+                <select @bind="user.Gender">
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
 
-            <label>Contact Number:</label>
-            <input @bind="user.ContactNumber" />
-        </div>
 
-        <div class="info-column">
-            <label>Birthdate:</label>
-            <input type="date" @bind="user.Birthdate"
-                   min="@minBirthdate.ToString("yyyy-MM-dd")"
-                   max="@maxBirthdate.ToString("yyyy-MM-dd")" />
+			<label>Contact Number:</label>
+			<input @bind="user.ContactNumber" />
+		</div>
 
-            <label>Email Address:</label>
-            <input type="email" @bind="user.Email" />
+		<div class="info-column">
+			<label>Birthdate:</label>
+			<input type="date" @bind="user.Birthdate"
+				   min="@minBirthdate.ToString("yyyy-MM-dd")"
+				   max="@maxBirthdate.ToString("yyyy-MM-dd")" />
 
-            <label>Username:</label>
-            <input @bind="user.Username" />
+			<label>Email Address:</label>
+			<input type="email" @bind="user.Email" />
 
-            <label>Password:</label>
-            <input type="password" @bind="user.Password" />
-        </div>
-    </div>
+			<label>Username:</label>
+			<input @bind="user.Username" />
 
-    <button class="save-btn" @onclick="SignUpUser">SIGN UP</button>
+			<label>Password:</label>
+			<div class="password-wrapper">
+				<input type="password" @bind="user.Password" id="passwordInput" />
+				<button type="button" class="toggle-password" onclick="togglePassword()">Show</button>
+			</div>
 
-    <p class="message">@message</p>
+		</div>
+	</div>
+
+	<button class="save-btn" @onclick="SignUpUser">SIGN UP</button>
+
+	<p class="message">@message</p>
 </div>
+
+
 
 @code {
     private User user = new();
     private string message = "";
+    private string fileError = "";
+    private bool isLoading = false;
+    private bool isError = false;
     private DateTime minBirthdate;
     private DateTime maxBirthdate;
+
+    // Image handling
+    private string? imageUrl;
+    private IBrowserFile? selectedFile;
+    private const long MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
     protected override void OnInitialized()
     {
@@ -93,31 +121,44 @@
 
     private async Task SignUpUser()
     {
-        // Validate required fields
-        if (string.IsNullOrWhiteSpace(user.FirstName) ||
-            string.IsNullOrWhiteSpace(user.MiddleName) ||
-            string.IsNullOrWhiteSpace(user.LastName) ||
-            string.IsNullOrWhiteSpace(user.Email) ||
-            string.IsNullOrWhiteSpace(user.Gender) ||
-            string.IsNullOrWhiteSpace(user.Username) ||
-            string.IsNullOrWhiteSpace(user.ContactNumber) ||
-            string.IsNullOrWhiteSpace(user.Email) ||
-            string.IsNullOrWhiteSpace(user.Password))
-        {
-            message = "Please fill all required fields.";
-            return;
-        }
-
-        if (user.Birthdate < minBirthdate || user.Birthdate > maxBirthdate)
-        {
-            message = $"Please select a valid birthdate between {minBirthdate:MM/dd/yyyy} and {maxBirthdate:MM/dd/yyyy}.";
-            return;
-        }
+        // Reset messages
+        message = "";
+        fileError = "";
+        isError = false;
+        isLoading = true;
 
         try
         {
+            // Validate required fields
+            if (string.IsNullOrWhiteSpace(user.FirstName) ||
+                string.IsNullOrWhiteSpace(user.LastName) ||
+                string.IsNullOrWhiteSpace(user.Email) ||
+                string.IsNullOrWhiteSpace(user.Gender) ||
+                string.IsNullOrWhiteSpace(user.Username) ||
+                string.IsNullOrWhiteSpace(user.ContactNumber) ||
+                string.IsNullOrWhiteSpace(user.Password))
+            {
+                message = "Please fill all required fields.";
+                isError = true;
+                return;
+            }
+
+            if (user.Birthdate < minBirthdate || user.Birthdate > maxBirthdate)
+            {
+                message = $"Please select a valid birthdate between {minBirthdate:MM/dd/yyyy} and {maxBirthdate:MM/dd/yyyy}.";
+                isError = true;
+                return;
+            }
+
+            // Handle image upload if a file was selected
+            if (selectedFile != null)
+            {
+                await ProcessAndSaveImage();
+            }
+
             await UserService.CreateUser(user);
             message = "User registered successfully!";
+            isError = false;
 
             await Task.Delay(1000);
             Navigation.NavigateTo("/");
@@ -125,48 +166,85 @@
         catch (Exception ex)
         {
             message = $"Error creating account: {ex.Message}";
+            isError = true;
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
         }
     }
-    private string? imageUrl;
-    private ElementReference fileInput;
-
-    private void TriggerFileInput()
+    private void NavigateToLogin()
     {
-        // This will be handled by JavaScript interop
-        JSRuntime.InvokeVoidAsync("triggerFileInput", fileInput);
+        Navigation.NavigateTo("/");
     }
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
-        var file = e.File;
+        fileError = "";
+        selectedFile = e.File;
 
         // Validate file type
-        if (file.ContentType.Contains("image/png") ||
-            file.ContentType.Contains("image/jpeg") ||
-            file.ContentType.Contains("image/jpg"))
+        if (!selectedFile.ContentType.Contains("image/png") &&
+            !selectedFile.ContentType.Contains("image/jpeg") &&
+            !selectedFile.ContentType.Contains("image/jpg"))
         {
-            // Check file size (optional: limit to 5MB)
-            if (file.Size > 5 * 1024 * 1024)
-            {
-                // Handle file too large error - ongoing
-                
-                return;
-            }
+            fileError = "Please select a valid image file (PNG, JPEG, or JPG).";
+            selectedFile = null;
+            return;
+        }
 
-            // Convert to base64 for display
+        // Check file size
+        if (selectedFile.Size > MAX_FILE_SIZE)
+        {
+            fileError = "File size must be less than 5MB.";
+            selectedFile = null;
+            return;
+        }
+
+        try
+        {
+            // Convert to base64 for display preview
             var format = "image/png";
-            var resizedImage = await file.RequestImageFileAsync(format, 100, 100);
+            var resizedImage = await selectedFile.RequestImageFileAsync(format, 200, 200);
             var buffer = new byte[resizedImage.Size];
             await resizedImage.OpenReadStream().ReadAsync(buffer);
             imageUrl = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
 
-            // Alternatively, you can upload the file to your server here
-            // await UploadFile(file);
+            StateHasChanged();
         }
-        else
+        catch (Exception ex)
         {
-            // Handle invalid file type
-            // You can show an error message to the user
+            fileError = $"Error processing image: {ex.Message}";
+            selectedFile = null;
+        }
+    }
+
+    private async Task ProcessAndSaveImage()
+    {
+        if (selectedFile == null) return;
+
+        try
+        {
+            // Convert the image to base64 and store in user model
+            var format = "image/png";
+            var resizedImage = await selectedFile.RequestImageFileAsync(format, 400, 400);
+            var buffer = new byte[resizedImage.Size];
+            await resizedImage.OpenReadStream().ReadAsync(buffer);
+
+            // Store base64 string in user model
+            user.ProfileImageUrl = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to process image: {ex.Message}");
         }
     }
 }
+
+<script>
+	function togglePassword() {
+		const input = document.getElementById('passwordInput');
+		input.type = input.type === 'password' ? 'text' : 'password';
+	}
+</script>
