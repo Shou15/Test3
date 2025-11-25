@@ -1,0 +1,91 @@
+﻿@using Test3.Data.Models
+@using Test3.Data.Services
+@using Microsoft.AspNetCore.Components.Forms
+@inject RoomService RoomService
+@inject NavigationManager Navigation
+@inject ImageService ImageService
+
+<div class="modal-overlay @(IsVisible ? "visible" : "")">
+	<div class="modal-content account-modal">
+
+		<!-- Header -->
+		<div class="modal-header">
+			<button class="back-btn" @onclick="CloseModal">&#x2190;</button>
+			<h3>Account Information</h3>
+		</div>
+
+		<!-- Profile section -->
+		<div class="profile-section">
+			<div class="profile-photo">
+				<img src="https://via.placeholder.com/120" alt="Profile Picture" />
+			</div>
+			<p class="profile-label">Profile Photo</p>
+		</div>
+
+		<div class="form-section">
+			<div class="form-row">
+				<label>First Name:</label>
+				<input type="text" class="info-input" readonly />
+			</div>
+
+			<div class="form-row">
+				<label>Middle Name:</label>
+				<input type="text" class="info-input" readonly />
+			</div>
+
+			<div class="form-row">
+				<label>Last Name:</label>
+				<input type="text" class="info-input" readonly />
+			</div>
+
+			<div class="form-row">
+				<label>Gender:</label>
+				<input type="text" class="info-input" readonly />
+			</div>
+
+			<div class="form-row">
+				<label>Contact Number:</label>
+				<input type="text" class="info-input" readonly />
+			</div>
+
+			<div class="form-row">
+				<label>Email Address:</label>
+				<input type="text" class="info-input" readonly />
+			</div>
+
+			<div class="form-row">
+				<label>Username:</label>
+				<input type="text" class="info-input" readonly />
+			</div>
+
+			<div class="form-row">
+				<label>Birthdate:</label>
+				<input type="text" class="info-input" readonly />
+			</div>
+		</div>
+
+		<div class="button-row">
+			<button class="logout-btn" @onclick ="logout">Logout</button>
+		</div>
+	</div>
+</div>
+
+@code {
+
+	private void logout()
+	{
+		Navigation.NavigateTo($"/", true);
+	}
+
+	[Parameter] public bool IsVisible { get; set; }
+	[Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+
+	private bool IsSaving = false;
+
+	private async Task CloseModal()
+	{
+		IsVisible = false;
+		await IsVisibleChanged.InvokeAsync(false);
+	}
+}
+
