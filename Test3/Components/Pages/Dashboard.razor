@@ -1,167 +1,139 @@
-@page "/dashboard/{userId}"
+@page "/dashboard"
 @using Test3.Data.Models
 @using Test3.Data.Services
 @inject ApartmentService ApartmentService
-@inject UserService UserService
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
 
 <div class="dashboard-container">
-    <!-- Header -->
-    <header class="dashboard-header">
-        <div class="left-section">
-            <img src="images/Default_Landlord.png" alt="Logo" class="logo" />
-            <div>
-                <h1>TENANT DASHBOARD</h1>
-                <p>Welcome back</p>
-            </div>
-        </div>
-        <div class="center-section">
-            <div class="search-bar">
-                <input type="text"
-                       placeholder="Search by apartment name or location"
-                       @bind="searchTerm"
-                       @bind:event="oninput"
-                       @onkeypress="OnKeyPress" />
-                <button><i class="fa fa-search"></i></button>
-            </div>
-        </div>
-        <div class="right-section">
-            <button class="bill_btn" @onclick="ViewBill">View Bill</button>
-            <button class="account_btn" @onclick="() => ShowAccountModal = true">Account</button>
-        </div>
-    </header>
+	<!-- Header -->
+	<header class="dashboard-header">
+		<div class="left-section">
+			<img src="images/Default_Landlord.png" alt="Logo" class="logo" />
+			<div>
+				<h1>TENANT DASHBOARD</h1>
+				<p>Welcome back</p>
+			</div>
+		</div>
+		<div class="center-section">
+			<div class="search-bar">
+				<input type="text"
+					   placeholder="Search by apartment name or location"
+					   @bind="searchTerm"
+					   @bind:event="oninput" />
+				<button><i class="fa fa-search"></i></button>
+			</div>
+		</div>
+		<div class="right-section">
+			<button class="bill_btn" @onclick="ViewBill">View Bill</button>
+			<button class="account_btn" @onclick="() => ShowAccountModal = true">Account</button>
+		</div>
+	</header>
 
-    <!-- Apartments Grid -->
-    <main class="main-content">
-        <div class="apartments-grid">
-            @if (isLoading)
-            {
-                <div class="loading">Loading apartments...</div>
-            }
-            else if (apartments.Any())
-            {
-                @foreach (var apartment in apartments)
-                {
-                    <div class="apartment-card">
-                        <!-- Image Display - Replaces the placeholder -->
-                        <div class="image-container">
-                            @if (apartment.ImageData != null && apartment.ImageData.Length > 0)
-                            {
-                                <img src="data:@apartment.ImageContentType;base64,@Convert.ToBase64String(apartment.ImageData)"
-                                     alt="@apartment.ApartmentName"
-                                     class="apartment-image" />
-                            }
-                            else
-                            {
-                                <div class="image-placeholder">
-                                    <span>No Image</span>
-                                </div>
-                            }
-                        </div>
-                        <div class="info">
-                            <p><strong>Location:</strong> @apartment.Address</p>
-                            <p><strong>Name of Apartment:</strong> @apartment.ApartmentName</p>
-                        </div>
-                        <button class="view-btn" @onclick="() => ViewApartment(apartment.Id)">View</button>
-                    </div>
-                }
-            }
-            else
-            {
-                <div class="no-apartments">
-                    No apartments found. @(string.IsNullOrEmpty(searchTerm) ? "The database might be empty." : "Try a different search term.")
-                </div>
-            }
-        </div>
-    </main>
+	<!-- Apartments Grid -->
+	<main class="main-content">
+		<div class="apartments-grid">
+			@if (isLoading)
+			{
+				<div class="loading">Loading apartments...</div>
+			}
+			else if (apartments.Any())
+			{
+				@foreach (var apartment in apartments)
+				{
+					<div class="apartment-card">
+						<!-- Image Display - Replaces the placeholder -->
+						<div class="image-container">
+							@if (apartment.ImageData != null && apartment.ImageData.Length > 0)
+							{
+								<img src="data:@apartment.ImageContentType;base64,@Convert.ToBase64String(apartment.ImageData)"
+									 alt="@apartment.ApartmentName"
+									 class="apartment-image" />
+							}
+							else
+							{
+								<div class="image-placeholder">
+									<span>No Image</span>
+								</div>
+							}
+						</div>
+						<div class="info">
+							<p><strong>Location:</strong> @apartment.Address</p>
+							<p><strong>Name of Apartment:</strong> @apartment.ApartmentName</p>
+						</div>
+						<button class="view-btn" @onclick="() => ViewApartment(apartment.Id)">View</button>
+					</div>
+				}
+			}
+			else
+			{
+				<div class="no-apartments">
+					No apartments found. @(string.IsNullOrEmpty(searchTerm) ? "The database might be empty." : "Try a different search term.")
+				</div>
+			}
+		</div>
+	</main>
 </div>
 
 <ViewAccount IsVisible="ShowAccountModal"
-             IsVisibleChanged="@(value => ShowAccountModal = value)"
-             CurrentUser="currentUser">
+			 IsVisibleChanged="@(value => ShowAccountModal = value)">
 </ViewAccount>
 
 @code {
-    private bool ShowAccountModal = false;
+	private bool ShowAccountModal = false;
 
-    private List<Apartment> apartments = new();
-    private string searchTerm = string.Empty;
-    private bool isLoading = true;
-    private Timer? searchTimer;
-    private User? currentUser;
+	private List<Apartment> apartments = new();
+	private string searchTerm = string.Empty;
+	private bool isLoading = true;
+	private Timer? searchTimer;
 
-    [Parameter]
-    public string UserId { get; set; } = string.Empty;
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadApartments();
+	}
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadApartments();
-        await LoadCurrentUser();
-    }
+	private async Task LoadApartments()
+	{
+		isLoading = true;
+		StateHasChanged(); // Force UI update to show loading
 
-    private async Task LoadCurrentUser()
-    {
-        if (!string.IsNullOrEmpty(UserId))
-        {
-            currentUser = await UserService.GetUserByIdAsync(UserId);
-        }
-    }
+		if (string.IsNullOrEmpty(searchTerm))
+		{
+			apartments = await ApartmentService.GetApartmentsAsync();
+		}
+		else
+		{
+			apartments = await ApartmentService.SearchApartmentsAsync(searchTerm);
+		}
 
-    private async Task LoadApartments()
-    {
-        isLoading = true;
-        StateHasChanged();
+		isLoading = false;
+		StateHasChanged(); // Force UI update to show results
+	}
 
-        if (string.IsNullOrEmpty(searchTerm))
-        {
-            apartments = await ApartmentService.GetApartmentsAsync();
-        }
-        else
-        {
-            apartments = await ApartmentService.SearchApartmentsAsync(searchTerm);
-        }
+	private async void OnSearchChanged(ChangeEventArgs e)
+	{
+		searchTerm = e.Value?.ToString() ?? string.Empty;
 
-        isLoading = false;
-        StateHasChanged();
-    }
+		// Simple debounce - wait 300ms after user stops typing
+		searchTimer?.Dispose();
+		searchTimer = new Timer(async _ =>
+		{
+			await InvokeAsync(LoadApartments);
+		}, null, 300, Timeout.Infinite);
+	}
 
-    private async Task SearchApartments()
-    {
-        await LoadApartments();
-    }
+	void ViewBill()
+	{
+		Navigation.NavigateTo($"/payments");
+	}
 
-    private async Task OnKeyPress(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
-        {
-            await SearchApartments();
-        }
-    }
+	void ViewApartment(string id)
+	{
+		Navigation.NavigateTo($"/ViewApartment/{id}");
+	}
 
-    private async void OnSearchChanged(ChangeEventArgs e)
-    {
-        searchTerm = e.Value?.ToString() ?? string.Empty;
-
-        searchTimer?.Dispose();
-        searchTimer = new Timer(async _ =>
-        {
-            await InvokeAsync(LoadApartments);
-        }, null, 300, Timeout.Infinite);
-    }
-
-    void ViewBill()
-    {
-        Navigation.NavigateTo($"/payments/{UserId}");
-    }
-
-    void ViewApartment(string id)
-    {
-        Navigation.NavigateTo($"/ViewApartment/{id}/{UserId}");
-    }
-
-    public void Dispose()
-    {
-        searchTimer?.Dispose();
-    }
+	public void Dispose()
+	{
+		searchTimer?.Dispose();
+	}
 }

@@ -1,92 +1,91 @@
 ﻿@using Test3.Data.Models
 @using Test3.Data.Services
 @using Microsoft.AspNetCore.Components.Forms
+@inject RoomService RoomService
 @inject NavigationManager Navigation
+@inject ImageService ImageService
 
 <div class="modal-overlay @(IsVisible ? "visible" : "")">
-    <div class="modal-content account-modal">
-        <!-- Header -->
-        <div class="modal-header">
-            <button class="back-btn" @onclick="CloseModal">&#x2190;</button>
-            <h3>Account Information</h3>
-        </div>
+	<div class="modal-content account-modal">
 
-        <!-- Profile section -->
-        <div class="profile-section">
-            <div class="profile-photo">
-                @if (!string.IsNullOrEmpty(CurrentUser?.ProfileImageUrl))
-                {
-                    <img src="@CurrentUser.ProfileImageUrl" alt="Profile Picture" />
-                }
-                else
-                {
-                    <img src="images/Default_Landlord.png" alt="Profile Picture" />
-                }
-            </div>
-            <p class="profile-label">Profile Photo</p>
-        </div>
+		<!-- Header -->
+		<div class="modal-header">
+			<button class="back-btn" @onclick="CloseModal">&#x2190;</button>
+			<h3>Account Information</h3>
+		</div>
 
-        <div class="form-section">
-            <div class="form-row">
-                <label>First Name:</label>
-                <input type="text" class="info-input" value="@CurrentUser?.FirstName" readonly />
-            </div>
+		<!-- Profile section -->
+		<div class="profile-section">
+			<div class="profile-photo">
+				<img src="https://via.placeholder.com/120" alt="Profile Picture" />
+			</div>
+			<p class="profile-label">Profile Photo</p>
+		</div>
 
-            <div class="form-row">
-                <label>Middle Name:</label>
-                <input type="text" class="info-input" value="@CurrentUser?.MiddleName" readonly />
-            </div>
+		<div class="form-section">
+			<div class="form-row">
+				<label>First Name:</label>
+				<input type="text" class="info-input" readonly />
+			</div>
 
-            <div class="form-row">
-                <label>Last Name:</label>
-                <input type="text" class="info-input" value="@CurrentUser?.LastName" readonly />
-            </div>
+			<div class="form-row">
+				<label>Middle Name:</label>
+				<input type="text" class="info-input" readonly />
+			</div>
 
-            <div class="form-row">
-                <label>Gender:</label>
-                <input type="text" class="info-input" value="@CurrentUser?.Gender" readonly />
-            </div>
+			<div class="form-row">
+				<label>Last Name:</label>
+				<input type="text" class="info-input" readonly />
+			</div>
 
-            <div class="form-row">
-                <label>Contact Number:</label>
-                <input type="text" class="info-input" value="@CurrentUser?.ContactNumber" readonly />
-            </div>
+			<div class="form-row">
+				<label>Gender:</label>
+				<input type="text" class="info-input" readonly />
+			</div>
 
-            <div class="form-row">
-                <label>Email Address:</label>
-                <input type="text" class="info-input" value="@CurrentUser?.Email" readonly />
-            </div>
+			<div class="form-row">
+				<label>Contact Number:</label>
+				<input type="text" class="info-input" readonly />
+			</div>
 
-            <div class="form-row">
-                <label>Username:</label>
-                <input type="text" class="info-input" value="@CurrentUser?.Username" readonly />
-            </div>
+			<div class="form-row">
+				<label>Email Address:</label>
+				<input type="text" class="info-input" readonly />
+			</div>
 
-            <div class="form-row">
-                <label>Birthdate:</label>
-                <input type="text" class="info-input" value="@CurrentUser?.Birthdate.ToString("MM/dd/yyyy")" readonly />
-            </div>
-        </div>
+			<div class="form-row">
+				<label>Username:</label>
+				<input type="text" class="info-input" readonly />
+			</div>
 
-        <div class="button-row">
-            <button class="logout-btn" @onclick="logout">Logout</button>
-        </div>
-    </div>
+			<div class="form-row">
+				<label>Birthdate:</label>
+				<input type="text" class="info-input" readonly />
+			</div>
+		</div>
+
+		<div class="button-row">
+			<button class="logout-btn" @onclick ="logout">Logout</button>
+		</div>
+	</div>
 </div>
 
 @code {
-    [Parameter] public bool IsVisible { get; set; }
-    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
-    [Parameter] public User? CurrentUser { get; set; }
 
-    private void logout()
-    {
-        Navigation.NavigateTo("/", true);
-    }
+	private void logout()
+	{
+		Navigation.NavigateTo($"/", true);
+	}
 
-    private async Task CloseModal()
-    {
-        IsVisible = false;
-        await IsVisibleChanged.InvokeAsync(false);
-    }
+	[Parameter] public bool IsVisible { get; set; }
+	[Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+
+	private bool IsSaving = false;
+
+	private async Task CloseModal()
+	{
+		IsVisible = false;
+		await IsVisibleChanged.InvokeAsync(false);
+	}
 }
+

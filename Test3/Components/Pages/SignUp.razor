@@ -1,4 +1,4 @@
-﻿@page "/SignUp"
+@page "/SignUp"
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
 @inject UserService UserService
@@ -43,16 +43,21 @@
         }
     </div>
 
-    <div class="info-section">
-        <div class="info-column">
-            <label>First Name:</label>
-            <input @bind="user.FirstName" />
+			</div>
+		</div>
 
-            <label>Middle Name:</label>
-            <input @bind="user.MiddleName" />
+	</header>
 
-            <label>Last Name:</label>
-            <input @bind="user.LastName" />
+	<div class="info-section">
+		<div class="info-column">
+			<label>First Name:</label>
+			<input @bind="user.FirstName" />
+
+			<label>Middle Name:</label>
+			<input @bind="user.MiddleName" />
+
+			<label>Last Name:</label>
+			<input @bind="user.LastName" />
 
             <label>Gender:</label>
             <select @bind="user.Gender">
@@ -62,26 +67,26 @@
                 <option value="Other">Other</option>
             </select>
 
-            <label>Contact Number:</label>
-            <input @bind="user.ContactNumber" />
-        </div>
+		<div class="info-column">
+			<label>Birthdate:</label>
+			<input type="date" @bind="user.Birthdate"
+				   min="@minBirthdate.ToString("yyyy-MM-dd")"
+				   max="@maxBirthdate.ToString("yyyy-MM-dd")" />
 
-        <div class="info-column">
-            <label>Birthdate:</label>
-            <input type="date" @bind="user.Birthdate"
-                   min="@minBirthdate.ToString("yyyy-MM-dd")"
-                   max="@maxBirthdate.ToString("yyyy-MM-dd")" />
+			<label>Email Address:</label>
+			<input type="email" @bind="user.Email" />
 
-            <label>Email Address:</label>
-            <input type="email" @bind="user.Email" />
+			<label>Username:</label>
+			<input @bind="user.Username" />
 
-            <label>Username:</label>
-            <input @bind="user.Username" />
+			<label>Password:</label>
+			<div class="password-wrapper">
+				<input type="password" @bind="user.Password" id="passwordInput" />
+				<button type="button" class="toggle-password" onclick="togglePassword()">Show</button>
+			</div>
 
-            <label>Password:</label>
-            <input type="password" @bind="user.Password" />
-        </div>
-    </div>
+		</div>
+	</div>
 
     <button class="save-btn" @onclick="SignUpUser" disabled="@isLoading">
         @if (isLoading)
@@ -96,6 +101,8 @@
 
     <p class="message" style="@(isError ? "color: red;" : "color: green;")">@message</p>
 </div>
+
+
 
 @code {
     private User user = new();
@@ -243,3 +250,10 @@
         }
     }
 }
+
+<script>
+	function togglePassword() {
+		const input = document.getElementById('passwordInput');
+		input.type = input.type === 'password' ? 'text' : 'password';
+	}
+</script>

@@ -1,4 +1,4 @@
-﻿body {
+body {
     font-family: Arial, sans-serif;
     background-color: #f2f2f2;
     margin: 0;
@@ -15,22 +15,82 @@
 }
 
 .profile-header {
+    position: relative;
     display: flex;
+    justify-content: center; 
     align-items: center;
-    justify-content: space-between;
-    background-color: #ddd;
-    padding: 1rem 2rem;
+    background-color: #64748B;
+    padding: 1rem;
+    text-align: center;
+    gap: 3rem; 
 }
 
-    .profile-header h2 {
-        margin: 0;
-        font-weight: 600;
+.back-btn {
+    position: absolute;
+    left: 30px;
+    top: 25px;
+    background: #ffffff;
+    color: #64748B;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    transition: all 0.2s ease;
+}
+
+    .back-btn:hover {
+        background: #f0f0f0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
     }
 
-    .profile-header .logo img {
-        width: 50px;
-        height: 50px;
-        object-fit: contain;
+
+
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: white;
+    text-align: center;
+
+}
+
+.photo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* centers photo + input horizontally */
+    justify-content: center;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+.file-input-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+    margin-left: 10px;
+}
+
+.custom-file-input {
+    position: relative; /* important */
+    width: 280px;
+    background: #ffffff;
+    padding: 10px 5px;
+    border-radius: 30px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+
+    .custom-file-input:hover {
+        box-shadow: 0 4px 14px rgba(0,0,0,0.2);
     }
 
 .edit-btn {
@@ -42,11 +102,6 @@
     text-decoration: underline;
 }
 
-.photo-section {
-    text-align: center;
-    padding: 2rem 0 1rem 0;
-    background-color: #ddd;
-}
 
 .photo-placeholder {
     width: 100px;
