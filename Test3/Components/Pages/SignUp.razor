@@ -9,97 +9,88 @@
 
 <div class="profile-container">
     <header class="profile-header">
-        <div class="logo">
-            <img src="images/Default_Landlord.png" alt="Default User" />
+        <button class="back-btn" @onclick="NavigateToLogin">? Back</button>
+
+
+
+        <div class="photo-section">
+            <h2 class="section-title">Tenant's Personal Information</h2>
+            <div class="photo-placeholder">
+                @if (imageUrl != null)
+                {
+                    <img src="@imageUrl" alt="User Photo"
+                         style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;" />
+                }
+                else
+                {
+                    <img src="images/Default_Landlord.png" alt="Default User"
+                         style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;" />
+                }
+            </div>
+
+            <div class="file-input-wrapper">
+                <label class="custom-file-input">
+                    <InputFile OnChange="HandleFileSelected"
+                               accept=".png,.jpg,.jpeg"
+                               class="hidden-file-input" />
+                </label>
+
+
+            </div>
         </div>
-        <h2>User Sign Up</h2>
+
     </header>
 
-    <div style="position: fixed; bottom: 20px; right: 20px;">
-        <button class="back-btn" @onclick="NavigateToLogin">Back to Login</button>
-    </div>
+    <div class="info-section">
+        <div class="info-column">
+            <label>First Name:</label>
+            <input @bind="user.FirstName" />
 
-    <div class="photo-section">
-        <div class="photo-placeholder">
-            @if (!string.IsNullOrEmpty(imageUrl))
-            {
-                <img src="@imageUrl" alt="User Photo"
-                     style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;" />
-            }
-            else
-            {
-                <img src="images/Default_Landlord.png" alt="Default User"
-                     style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;" />
-            }
-        </div>
-        <br>
-        <InputFile OnChange="HandleFileSelected"
-                   accept=".png,.jpg,.jpeg"
-                   class="insert-photo-file-input"
-                   style="width:200px" />
-        @if (!string.IsNullOrEmpty(fileError))
-        {
-            <div class="error-message" style="color: red; font-size: 12px;">@fileError</div>
-        }
-    </div>
+            <label>Middle Name:</label>
+            <input @bind="user.MiddleName" />
 
-			</div>
-		</div>
-
-	</header>
-
-	<div class="info-section">
-		<div class="info-column">
-			<label>First Name:</label>
-			<input @bind="user.FirstName" />
-
-			<label>Middle Name:</label>
-			<input @bind="user.MiddleName" />
-
-			<label>Last Name:</label>
-			<input @bind="user.LastName" />
+            <label>Last Name:</label>
+            <input @bind="user.LastName" />
 
             <label>Gender:</label>
-            <select @bind="user.Gender">
-                <option value="">Select Gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-            </select>
+            <div class="select-wrapper">
+                <select @bind="user.Gender">
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
 
-		<div class="info-column">
-			<label>Birthdate:</label>
-			<input type="date" @bind="user.Birthdate"
-				   min="@minBirthdate.ToString("yyyy-MM-dd")"
-				   max="@maxBirthdate.ToString("yyyy-MM-dd")" />
 
-			<label>Email Address:</label>
-			<input type="email" @bind="user.Email" />
+            <label>Contact Number:</label>
+            <input @bind="user.ContactNumber" />
+        </div>
 
-			<label>Username:</label>
-			<input @bind="user.Username" />
+        <div class="info-column">
+            <label>Birthdate:</label>
+            <input type="date" @bind="user.Birthdate"
+                   min="@minBirthdate.ToString("yyyy-MM-dd")"
+                   max="@maxBirthdate.ToString("yyyy-MM-dd")" />
 
-			<label>Password:</label>
-			<div class="password-wrapper">
-				<input type="password" @bind="user.Password" id="passwordInput" />
-				<button type="button" class="toggle-password" onclick="togglePassword()">Show</button>
-			</div>
+            <label>Email Address:</label>
+            <input type="email" @bind="user.Email" />
 
-		</div>
-	</div>
+            <label>Username:</label>
+            <input @bind="user.Username" />
 
-    <button class="save-btn" @onclick="SignUpUser" disabled="@isLoading">
-        @if (isLoading)
-        {
-            <span>Processing...</span>
-        }
-        else
-        {
-            <span>SIGN UP</span>
-        }
-    </button>
+            <label>Password:</label>
+            <div class="password-wrapper">
+                <input type="password" @bind="user.Password" id="passwordInput" />
+                <button type="button" class="toggle-password" onclick="togglePassword()">Show</button>
+            </div>
 
-    <p class="message" style="@(isError ? "color: red;" : "color: green;")">@message</p>
+        </div>
+    </div>
+
+    <button class="save-btn" @onclick="SignUpUser">SIGN UP</button>
+
+    <p class="message">@message</p>
 </div>
 
 
@@ -252,8 +243,8 @@
 }
 
 <script>
-	function togglePassword() {
-		const input = document.getElementById('passwordInput');
-		input.type = input.type === 'password' ? 'text' : 'password';
-	}
+    function togglePassword() {
+        const input = document.getElementById('passwordInput');
+        input.type = input.type === 'password' ? 'text' : 'password';
+    }
 </script>

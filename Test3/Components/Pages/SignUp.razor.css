@@ -17,12 +17,12 @@ body {
 .profile-header {
     position: relative;
     display: flex;
-    justify-content: center; 
+    justify-content: center;
     align-items: center;
     background-color: #64748B;
     padding: 1rem;
     text-align: center;
-    gap: 3rem; 
+    gap: 3rem;
 }
 
 .back-btn {
@@ -55,7 +55,6 @@ body {
     margin-bottom: 1rem;
     color: white;
     text-align: center;
-
 }
 
 .photo-section {
@@ -66,6 +65,7 @@ body {
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
+
 .file-input-wrapper {
     display: flex;
     justify-content: center;
@@ -145,67 +145,87 @@ label {
     color: #555;
 }
 
-.insert-photo-file-input {
-    width: 200px;
-}
-
-input, select {
+input {
     width: 100%;
     padding: 0.6rem;
     margin-bottom: 1rem;
     border: none;
     border-radius: 20px;
     background-color: #e6e6e6;
-    box-sizing: border-box;
 }
 
-    input:enabled, select:enabled {
+    input:enabled {
         background-color: #fff;
         border: 1px solid #ccc;
     }
 
-.save-btn {
+.insert-photo-file-input {
+    width: 200px;
+}
+
+
+.select-wrapper {
+    position: relative;
     width: 100%;
-    padding: 12px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
 }
 
-    .save-btn:disabled {
-        background-color: #6c757d;
-        cursor: not-allowed;
+    .select-wrapper select {
+        width: 105%;
+        padding: 0.6rem 1rem;
+        margin-bottom: 1rem;
+        border: none;
+        border-radius: 20px;
+        background-color: #e6e6e6;
+        color: #333;
+        font-size: 0.95rem;
+        cursor: pointer;
     }
 
-    .save-btn:hover:not(:disabled) {
-        background-color: #0056b3;
-    }
+        /* On enabled (match your input:enabled style) */
+        .select-wrapper select:enabled {
+            background-color: #fff;
+            border: 1px solid #ccc;
+        }
 
-.error-message {
-    color: red;
-    font-size: 12px;
-    margin-top: 5px;
-}
-
-.message {
-    text-align: center;
-    margin-top: 10px;
-    font-weight: bold;
-}
-.back-btn {
-    padding: 10px 20px;
-    background-color: #6c757d;
+.save-btn {
+    display: block;
+    margin: 0 auto 2rem auto; /* centers horizontally */
+    padding: 0.7rem 2rem;
+    background: #64748B;
     color: white;
     border: none;
-    border-radius: 20px;
+    border-radius: 25px;
+    font-size: 1rem;
     cursor: pointer;
-    font-size: 14px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
-    .back-btn:hover {
-        background-color: #5a6268;
+    .save-btn:hover {
+        background: #55627A;
+    }
+
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+    .password-wrapper input {
+        width: 100%;
+        padding-right: 10px; /* space for the eye button */
+    }
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-80%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    opacity: 0.6;
+}
+
+    .toggle-password:hover {
+        opacity: 1;
     }
