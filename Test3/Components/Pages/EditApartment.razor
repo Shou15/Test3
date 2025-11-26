@@ -105,17 +105,17 @@
                         <div class="unit-image-stack">
                             @if (room.Images.Any())
                             {
-                                <div class="stacked-images">
-                                    <div class="primary-image">
-                                        <img src="data:@room.Images[0].ImageContentType;base64,@Convert.ToBase64String(room.Images[0].ImageData)"
-                                             alt="@room.UnitNumber"
-                                             class="stacked-preview-image"
-                                             @onclick="() => ViewUnitImages(room)" />
-                                        @if (room.Images.Count > 1)
-                                        {
-                                            <div class="image-counter">+@(room.Images.Count - 1) more</div>
-                                        }
-                                    </div>
+                                <div class="stacked-thumbnails" @onclick="() => ViewUnitImages(room)">
+                                    @foreach (var image in room.Images.Take(3))
+                                    {
+                                        <img src="@ImageService.GetImageSrc(image.ImageData, image.ImageContentType)"
+                                             alt="Room image"
+                                             class="thumbnail" />
+                                    }
+                                    @if (room.Images.Count > 3)
+                                    {
+                                        <div class="thumbnail-count">+@(room.Images.Count - 3)</div>
+                                    }
                                 </div>
                             }
                             else
@@ -209,31 +209,52 @@
     </div>
 }
 
-<!-- Unit Images Modal -->
+<!-- Unit Images Gallery Modal -->
 @if (showImagesModal && selectedRoomForImages != null)
 {
-    <div class="modal-overlay visible">
-        <div class="modal-content images-modal">
-            <div class="modal-header">
-                <h3>Unit @selectedRoomForImages.UnitNumber - Images</h3>
-                <button class="close-btn" @onclick="CloseImagesModal">×</button>
-            </div>
-            <div class="modal-body">
-                <div class="images-grid">
-                    @foreach (var image in selectedRoomForImages.Images)
+    <div class="gallery-modal" @onclick="CloseImagesModal">
+        <div class="gallery-content" @onclick:stopPropagation="true">
+            <button class="gallery-close" @onclick="CloseImagesModal">×</button>
+
+            <h3>Unit @selectedRoomForImages.UnitNumber - Images</h3>
+
+            @if (selectedRoomForImages.Images.Any())
+            {
+                <div class="gallery-main-image">
+                    <img src="@ImageService.GetImageSrc(selectedRoomForImages.Images[currentImageIndex].ImageData, selectedRoomForImages.Images[currentImageIndex].ImageContentType)"
+                         alt="Unit image @(currentImageIndex + 1)" />
+                </div>
+
+                <div class="gallery-controls">
+                    <button class="gallery-nav gallery-prev" @onclick="PreviousImage"
+                            disabled="@(currentImageIndex == 0)">
+                        ‹
+                    </button>
+
+                    <div class="gallery-counter">
+                        @(currentImageIndex + 1) / @selectedRoomForImages.Images.Count
+                    </div>
+
+                    <button class="gallery-nav gallery-next" @onclick="NextImage"
+                            disabled="@(currentImageIndex == selectedRoomForImages.Images.Count - 1)">
+                        ›
+                    </button>
+                </div>
+
+                <div class="gallery-thumbnails">
+                    @for (int i = 0; i < selectedRoomForImages.Images.Count; i++)
                     {
-                        <div class="image-item">
-                            <img src="data:@image.ImageContentType;base64,@Convert.ToBase64String(image.ImageData)"
-                                 alt="Unit image"
-                                 class="modal-image" />
-                        </div>
+                        <img src="@ImageService.GetImageSrc(selectedRoomForImages.Images[i].ImageData, selectedRoomForImages.Images[i].ImageContentType)"
+                             class="@(i == currentImageIndex ? "thumbnail-active" : "")"
+                             @onclick="() => SetCurrentImage(i)"
+                             alt="Thumbnail @(i + 1)" />
                     }
                 </div>
-                @if (!selectedRoomForImages.Images.Any())
-                {
-                    <div class="no-images">No images available for this unit.</div>
-                }
-            </div>
+            }
+            else
+            {
+                <div class="no-images">No images available for this unit.</div>
+            }
         </div>
     </div>
 }
@@ -278,6 +299,9 @@
     // Images Modal
     private bool showImagesModal = false;
     private Room? selectedRoomForImages = null;
+
+    // Gallery state
+    private int currentImageIndex = 0;
 
     private Dictionary<string, string> unitTenantMapping = new();
 
@@ -342,7 +366,6 @@
             StateHasChanged();
         }
     }
-
 
     private void AddNewUnit()
     {
@@ -425,6 +448,7 @@
     private void ViewUnitImages(Room room)
     {
         selectedRoomForImages = room;
+        currentImageIndex = 0; // Reset to first image
         showImagesModal = true;
         StateHasChanged();
     }
@@ -433,6 +457,32 @@
     {
         showImagesModal = false;
         selectedRoomForImages = null;
+        currentImageIndex = 0;
+        StateHasChanged();
+    }
+
+    // Gallery navigation methods
+    private void NextImage()
+    {
+        if (selectedRoomForImages != null && currentImageIndex < selectedRoomForImages.Images.Count - 1)
+        {
+            currentImageIndex++;
+            StateHasChanged();
+        }
+    }
+
+    private void PreviousImage()
+    {
+        if (selectedRoomForImages != null && currentImageIndex > 0)
+        {
+            currentImageIndex--;
+            StateHasChanged();
+        }
+    }
+
+    private void SetCurrentImage(int index)
+    {
+        currentImageIndex = index;
         StateHasChanged();
     }
 
@@ -532,5 +582,6 @@
         else
         {
             Navigation.NavigateTo("/ManageApartment");
-        }    }
+        }
+    }
 }

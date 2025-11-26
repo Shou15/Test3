@@ -4,6 +4,7 @@
 @inject ApartmentService ApartmentService
 @inject RoomService RoomService
 @inject NavigationManager Navigation
+@inject ImageService ImageService
 @rendermode InteractiveServer
 
 <div class="container">
@@ -46,7 +47,30 @@
                 @foreach (var room in rooms)
                 {
                     <div class="room-card">
-                        <div class="room-img"></div>
+                        <!-- Image Gallery Thumbnail -->
+                        <div class="room-img-gallery">
+                            @if (room.Images != null && room.Images.Any())
+                            {
+                                <div class="stacked-thumbnails" @onclick="() => OpenGallery(room)">
+                                    @foreach (var image in room.Images.Take(3))
+                                    {
+                                        <img src="@ImageService.GetImageSrc(image.ImageData, image.ImageContentType)"
+                                             alt="Room image"
+                                             class="thumbnail" />
+                                    }
+                                    @if (room.Images.Count > 3)
+                                    {
+                                        <div class="thumbnail-count">+@(room.Images.Count - 3)</div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="image-placeholder" @onclick="() => OpenGallery(room)">
+                                    <span>No Images</span>
+                                </div>
+                            }
+                        </div>
                         <div class="room-details">
                             <p><strong>Unit Number:</strong> @room.UnitNumber</p>
                             <p><strong>Room type:</strong> @room.RoomType</p>
@@ -78,6 +102,47 @@
     }
 </div>
 
+<!-- Image Gallery Modal -->
+@if (showGallery && currentRoom != null && currentRoom.Images.Any())
+{
+    <div class="gallery-modal" @onclick="CloseGallery">
+        <div class="gallery-content" @onclick:stopPropagation="true">
+            <button class="gallery-close" @onclick="CloseGallery">×</button>
+
+            <div class="gallery-main-image">
+                <img src="@ImageService.GetImageSrc(currentRoom.Images[currentImageIndex].ImageData, currentRoom.Images[currentImageIndex].ImageContentType)"
+                     alt="Room image @(currentImageIndex + 1)" />
+            </div>
+
+            <div class="gallery-controls">
+                <button class="gallery-nav gallery-prev" @onclick="PreviousImage"
+                        disabled="@(currentImageIndex == 0)">
+                    ‹
+                </button>
+
+                <div class="gallery-counter">
+                    @(currentImageIndex + 1) / @currentRoom.Images.Count
+                </div>
+
+                <button class="gallery-nav gallery-next" @onclick="NextImage"
+                        disabled="@(currentImageIndex == currentRoom.Images.Count - 1)">
+                    ›
+                </button>
+            </div>
+
+            <div class="gallery-thumbnails">
+                @for (int i = 0; i < currentRoom.Images.Count; i++)
+                {
+                    <img src="@ImageService.GetImageSrc(currentRoom.Images[i].ImageData, currentRoom.Images[i].ImageContentType)"
+                         class="@(i == currentImageIndex ? "thumbnail-active" : "")"
+                         @onclick="() => SetCurrentImage(i)"
+                         alt="Thumbnail @(i + 1)" />
+                }
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     [Parameter]
     public string ApartmentId { get; set; } = string.Empty;
@@ -89,6 +154,11 @@
     private List<Room> rooms = new();
     private (int totalRooms, int availableRooms) roomStats;
     private bool isLoading = true;
+
+    // Gallery state
+    private bool showGallery = false;
+    private Room? currentRoom = null;
+    private int currentImageIndex = 0;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -122,9 +192,51 @@
         StateHasChanged();
     }
 
+    private void OpenGallery(Room room)
+    {
+        if (room.Images != null && room.Images.Any())
+        {
+            currentRoom = room;
+            currentImageIndex = 0;
+            showGallery = true;
+            StateHasChanged();
+        }
+    }
+
+    private void CloseGallery()
+    {
+        showGallery = false;
+        currentRoom = null;
+        currentImageIndex = 0;
+        StateHasChanged();
+    }
+
+    private void NextImage()
+    {
+        if (currentRoom != null && currentImageIndex < currentRoom.Images.Count - 1)
+        {
+            currentImageIndex++;
+            StateHasChanged();
+        }
+    }
+
+    private void PreviousImage()
+    {
+        if (currentRoom != null && currentImageIndex > 0)
+        {
+            currentImageIndex--;
+            StateHasChanged();
+        }
+    }
+
+    private void SetCurrentImage(int index)
+    {
+        currentImageIndex = index;
+        StateHasChanged();
+    }
+
     private void GoBack()
     {
-        // Navigate back to dashboard with user ID
         Navigation.NavigateTo($"/dashboard/{UserId}");
     }
 }
