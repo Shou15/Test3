@@ -8,235 +8,228 @@
 @rendermode InteractiveServer
 
 <div class="container">
-    @if (isLoading)
-    {
-        <div class="loading">Loading apartment details...</div>
-    }
-    else if (apartment == null)
-    {
-        <div class="error">Apartment not found.</div>
-        <button @onclick="GoBack" class="back-btn">Go Back to Dashboard</button>
-    }
-    else
-    {
-        <header class="header">
-            <div class="logo">
-                <img src="images/Default_Landlord.png" alt="Logo">
-                <h2>LANDLORD PRO</h2>
-            </div>
+	@if (isLoading)
+	{
+		<div class="loading">Loading apartment details...</div>
+	}
+	else if (apartment == null)
+	{
+		<div class="error">Apartment not found.</div>
 
-            <div class="contact-info">
-                <p><strong>NAME:</strong> @apartment.ApartmentOwner</p>
-                <p><strong>ADDRESS:</strong> @apartment.Address</p>
-                <p><strong>FACEBOOK:</strong> @apartment.FacebookAccount</p>
-                <p><strong>EMAIL:</strong> @apartment.EmailAddress</p>
-                <p><strong>CONTACT NO:</strong> @apartment.ContactNo</p>
-            </div>
+	}
+	else
+	{
+		<header class="header">
+			<h3 class="contact-title">CONTACT THE LANDLORD AT:  </h3>
+			<button @onclick="GoBack" class="back-btn">Back to Dashboard</button>
+			<div class="contact-info">
+				<p><strong>NAME:</strong> @apartment.ApartmentOwner</p>
+				<p><strong>ADDRESS:</strong> @apartment.Address</p>
+				<p><strong>FACEBOOK:</strong> @apartment.FacebookAccount</p>
+				<p><strong>EMAIL:</strong> @apartment.EmailAddress</p>
+				<p><strong>CONTACT NO:</strong> @apartment.ContactNo</p>
+			</div>
 
-            <div class="summary">
-                <p><strong>Total rooms:</strong> @roomStats.totalRooms</p>
-                <p><strong>Available Room:</strong> @roomStats.availableRooms</p>
-            </div>
-        </header>
+			<div class="summary">
+				<p><strong>Total rooms:</strong> @roomStats.totalRooms</p>
+				<p><strong>Available Room:</strong> @roomStats.availableRooms</p>
+			</div>
+		</header>
 
-        <h3 class="contact-title">CONTACT THE LANDLORD AT: @apartment.ContactNo</h3>
 
-        <section class="room-grid">
-            @if (rooms.Any())
-            {
-                @foreach (var room in rooms)
-                {
-                    <div class="room-card">
-                        <!-- Image Gallery Thumbnail -->
-                        <div class="room-img-gallery">
-                            @if (room.Images != null && room.Images.Any())
-                            {
-                                <div class="stacked-thumbnails" @onclick="() => OpenGallery(room)">
-                                    @foreach (var image in room.Images.Take(3))
-                                    {
-                                        <img src="@ImageService.GetImageSrc(image.ImageData, image.ImageContentType)"
-                                             alt="Room image"
-                                             class="thumbnail" />
-                                    }
-                                    @if (room.Images.Count > 3)
-                                    {
-                                        <div class="thumbnail-count">+@(room.Images.Count - 3)</div>
-                                    }
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="image-placeholder" @onclick="() => OpenGallery(room)">
-                                    <span>No Images</span>
-                                </div>
-                            }
-                        </div>
-                        <div class="room-details">
-                            <p><strong>Unit Number:</strong> @room.UnitNumber</p>
-                            <p><strong>Room type:</strong> @room.RoomType</p>
-                            <p><strong>Room Price:</strong> ₱@room.RoomPrice.ToString("N2")</p>
-                            <p><strong>Aircon:</strong> @(room.Aircon ? "Yes" : "No")</p>
-                            <p>
-                                <strong>Status:</strong>
-                                <span class="@(room.Status == "Available" ? "status-available" : "status-occupied")">
-                                    @room.Status
-                                </span>
-                            </p>
-                            @if (!string.IsNullOrEmpty(room.Description))
-                            {
-                                <p><strong>Description:</strong> @room.Description</p>
-                            }
-                        </div>
-                    </div>
-                }
-            }
-            else
-            {
-                <div class="no-rooms">No rooms available for this apartment.</div>
-            }
-        </section>
 
-        <div class="action-buttons">
-            <button @onclick="GoBack" class="back-btn">Back to Dashboard</button>
-        </div>
-    }
+		<section class="room-grid">
+			@if (rooms.Any())
+			{
+				@foreach (var room in rooms)
+				{
+					<div class="room-card">
+						<!-- Image Gallery Thumbnail -->
+						<div class="room-img-gallery">
+							@if (room.Images != null && room.Images.Any())
+							{
+								<div class="stacked-thumbnails" @onclick="() => OpenGallery(room)">
+									@foreach (var image in room.Images.Take(3))
+									{
+										<img src="@ImageService.GetImageSrc(image.ImageData, image.ImageContentType)"
+											 alt="Room image"
+											 class="thumbnail" />
+									}
+									@if (room.Images.Count > 3)
+									{
+										<div class="thumbnail-count">+@(room.Images.Count - 3)</div>
+									}
+								</div>
+							}
+							else
+							{
+								<div class="image-placeholder" @onclick="() => OpenGallery(room)">
+									<span>No Images</span>
+								</div>
+							}
+						</div>
+						<div class="room-details">
+							<p><strong>Unit Number:</strong> @room.UnitNumber</p>
+							<p><strong>Room type:</strong> @room.RoomType</p>
+							<p><strong>Room Price:</strong> ₱@room.RoomPrice.ToString("N2")</p>
+							<p><strong>Aircon:</strong> @(room.Aircon ? "Yes" : "No")</p>
+							<p>
+								<strong>Status:</strong>
+								<span class="@(room.Status == "Available" ? "status-available" : "status-occupied")">
+									@room.Status
+								</span>
+							</p>
+							@if (!string.IsNullOrEmpty(room.Description))
+							{
+								<p><strong>Description:</strong> @room.Description</p>
+							}
+						</div>
+					</div>
+				}
+			}
+			else
+			{
+				<div class="no-rooms">No rooms available for this apartment.</div>
+			}
+		</section>
+	}
 </div>
 
 <!-- Image Gallery Modal -->
 @if (showGallery && currentRoom != null && currentRoom.Images.Any())
 {
-    <div class="gallery-modal" @onclick="CloseGallery">
-        <div class="gallery-content" @onclick:stopPropagation="true">
-            <button class="gallery-close" @onclick="CloseGallery">×</button>
+	<div class="gallery-modal" @onclick="CloseGallery">
+		<div class="gallery-content" @onclick:stopPropagation="true">
+			<button class="gallery-close" @onclick="CloseGallery">×</button>
 
-            <div class="gallery-main-image">
-                <img src="@ImageService.GetImageSrc(currentRoom.Images[currentImageIndex].ImageData, currentRoom.Images[currentImageIndex].ImageContentType)"
-                     alt="Room image @(currentImageIndex + 1)" />
-            </div>
+			<div class="gallery-main-image">
+				<img src="@ImageService.GetImageSrc(currentRoom.Images[currentImageIndex].ImageData, currentRoom.Images[currentImageIndex].ImageContentType)"
+					 alt="Room image @(currentImageIndex + 1)" />
+			</div>
 
-            <div class="gallery-controls">
-                <button class="gallery-nav gallery-prev" @onclick="PreviousImage"
-                        disabled="@(currentImageIndex == 0)">
-                    ‹
-                </button>
+			<div class="gallery-controls">
+				<button class="gallery-nav gallery-prev" @onclick="PreviousImage"
+						disabled="@(currentImageIndex == 0)">
+					‹
+				</button>
 
-                <div class="gallery-counter">
-                    @(currentImageIndex + 1) / @currentRoom.Images.Count
-                </div>
+				<div class="gallery-counter">
+					@(currentImageIndex + 1) / @currentRoom.Images.Count
+				</div>
 
-                <button class="gallery-nav gallery-next" @onclick="NextImage"
-                        disabled="@(currentImageIndex == currentRoom.Images.Count - 1)">
-                    ›
-                </button>
-            </div>
+				<button class="gallery-nav gallery-next" @onclick="NextImage"
+						disabled="@(currentImageIndex == currentRoom.Images.Count - 1)">
+					›
+				</button>
+			</div>
 
-            <div class="gallery-thumbnails">
-                @for (int i = 0; i < currentRoom.Images.Count; i++)
-                {
-                    <img src="@ImageService.GetImageSrc(currentRoom.Images[i].ImageData, currentRoom.Images[i].ImageContentType)"
-                         class="@(i == currentImageIndex ? "thumbnail-active" : "")"
-                         @onclick="() => SetCurrentImage(i)"
-                         alt="Thumbnail @(i + 1)" />
-                }
-            </div>
-        </div>
-    </div>
+			<div class="gallery-thumbnails">
+				@for (int i = 0; i < currentRoom.Images.Count; i++)
+				{
+					<img src="@ImageService.GetImageSrc(currentRoom.Images[i].ImageData, currentRoom.Images[i].ImageContentType)"
+						 class="@(i == currentImageIndex ? "thumbnail-active" : "")"
+						 @onclick="() => SetCurrentImage(i)"
+						 alt="Thumbnail @(i + 1)" />
+				}
+			</div>
+		</div>
+	</div>
 }
 
 @code {
-    [Parameter]
-    public string ApartmentId { get; set; } = string.Empty;
+	[Parameter]
+	public string ApartmentId { get; set; } = string.Empty;
 
-    [Parameter]
-    public string UserId { get; set; } = string.Empty;
+	[Parameter]
+	public string UserId { get; set; } = string.Empty;
 
-    private Apartment? apartment;
-    private List<Room> rooms = new();
-    private (int totalRooms, int availableRooms) roomStats;
-    private bool isLoading = true;
+	private Apartment? apartment;
+	private List<Room> rooms = new();
+	private (int totalRooms, int availableRooms) roomStats;
+	private bool isLoading = true;
 
-    // Gallery state
-    private bool showGallery = false;
-    private Room? currentRoom = null;
-    private int currentImageIndex = 0;
+	// Gallery state
+	private bool showGallery = false;
+	private Room? currentRoom = null;
+	private int currentImageIndex = 0;
 
-    protected override async Task OnParametersSetAsync()
-    {
-        if (!string.IsNullOrEmpty(ApartmentId))
-        {
-            await LoadApartmentData();
-        }
-        else
-        {
-            isLoading = false;
-        }
-    }
+	protected override async Task OnParametersSetAsync()
+	{
+		if (!string.IsNullOrEmpty(ApartmentId))
+		{
+			await LoadApartmentData();
+		}
+		else
+		{
+			isLoading = false;
+		}
+	}
 
-    private async Task LoadApartmentData()
-    {
-        isLoading = true;
+	private async Task LoadApartmentData()
+	{
+		isLoading = true;
 
-        // Load apartment details
-        apartment = await ApartmentService.GetApartmentByIdAsync(ApartmentId);
+		// Load apartment details
+		apartment = await ApartmentService.GetApartmentByIdAsync(ApartmentId);
 
-        if (apartment != null)
-        {
-            // Load rooms for this apartment
-            rooms = await RoomService.GetRoomsByApartmentIdAsync(ApartmentId);
+		if (apartment != null)
+		{
+			// Load rooms for this apartment
+			rooms = await RoomService.GetRoomsByApartmentIdAsync(ApartmentId);
 
-            // Calculate room statistics
-            roomStats = await RoomService.GetRoomStatsAsync(ApartmentId);
-        }
+			// Calculate room statistics
+			roomStats = await RoomService.GetRoomStatsAsync(ApartmentId);
+		}
 
-        isLoading = false;
-        StateHasChanged();
-    }
+		isLoading = false;
+		StateHasChanged();
+	}
 
-    private void OpenGallery(Room room)
-    {
-        if (room.Images != null && room.Images.Any())
-        {
-            currentRoom = room;
-            currentImageIndex = 0;
-            showGallery = true;
-            StateHasChanged();
-        }
-    }
+	private void OpenGallery(Room room)
+	{
+		if (room.Images != null && room.Images.Any())
+		{
+			currentRoom = room;
+			currentImageIndex = 0;
+			showGallery = true;
+			StateHasChanged();
+		}
+	}
 
-    private void CloseGallery()
-    {
-        showGallery = false;
-        currentRoom = null;
-        currentImageIndex = 0;
-        StateHasChanged();
-    }
+	private void CloseGallery()
+	{
+		showGallery = false;
+		currentRoom = null;
+		currentImageIndex = 0;
+		StateHasChanged();
+	}
 
-    private void NextImage()
-    {
-        if (currentRoom != null && currentImageIndex < currentRoom.Images.Count - 1)
-        {
-            currentImageIndex++;
-            StateHasChanged();
-        }
-    }
+	private void NextImage()
+	{
+		if (currentRoom != null && currentImageIndex < currentRoom.Images.Count - 1)
+		{
+			currentImageIndex++;
+			StateHasChanged();
+		}
+	}
 
-    private void PreviousImage()
-    {
-        if (currentRoom != null && currentImageIndex > 0)
-        {
-            currentImageIndex--;
-            StateHasChanged();
-        }
-    }
+	private void PreviousImage()
+	{
+		if (currentRoom != null && currentImageIndex > 0)
+		{
+			currentImageIndex--;
+			StateHasChanged();
+		}
+	}
 
-    private void SetCurrentImage(int index)
-    {
-        currentImageIndex = index;
-        StateHasChanged();
-    }
+	private void SetCurrentImage(int index)
+	{
+		currentImageIndex = index;
+		StateHasChanged();
+	}
 
-    private void GoBack()
-    {
-        Navigation.NavigateTo($"/dashboard/{UserId}");
-    }
+	private void GoBack()
+	{
+		Navigation.NavigateTo($"/dashboard/{UserId}");
+	}
 }

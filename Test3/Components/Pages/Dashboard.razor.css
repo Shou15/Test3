@@ -1,3 +1,4 @@
+
 body {
     margin: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -41,13 +42,14 @@ body {
         margin: 0;
         font-size: 1.2rem;
         white-space: nowrap;
+        color: white;
     }
 
     .dashboard-header p {
         margin: 0;
         font-style: italic;
         font-size: 0.9rem;
-        color: #444;
+        color: #FFFFFF;
     }
 
     .dashboard-header .center-section {
@@ -127,11 +129,6 @@ body {
         background-color: #b0b0b0;
     }
 
-
-
-
-
-
 .main-content {
     flex: 1;
     overflow-y: auto;
@@ -142,7 +139,7 @@ body {
 .apartments-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 3rem;
+    gap: 2rem;
     padding: 2rem;
 }
 
